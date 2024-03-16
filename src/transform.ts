@@ -17,6 +17,7 @@ import {
   findAllMomentDefaultSpecifiers,
   findAllMomentFactoryCalls,
   findAllReferences,
+  removeUnusedReferences,
 } from "./ast-utils";
 
 type ExpressionObject = MemberExpression["object"];
@@ -219,11 +220,13 @@ export default function transform(
   const imports: ImportDeclaration[] = [];
   invocations?.forEach((path) => processInvocation(path, imports, j));
   addImports(source, imports, j);
-  findAllMomentDefaultSpecifiers(source, j).forEach((path) => {
-    const references = findAllReferences(path, j);
-    if (!references || references.size() === 0) {
-      j(path).closest(j.ImportDeclaration).remove();
-    }
-  });
+  findAllMomentDefaultSpecifiers(source, j)
+    .find(j.Identifier)
+    .forEach((path) => {
+      const references = removeUnusedReferences(findAllReferences(path, j), j);
+      if (references.size() === 0) {
+        j(path).closest(j.ImportDeclaration).remove();
+      }
+    });
   return source.toSource(options.printOptions);
 }

@@ -10,9 +10,13 @@ describe("all cases", () => {
     vi.useFakeTimers();
   });
 
-  const files = globSync(join(__dirname, "cases/**/*.{js,ts}")).filter(
+  const allFiles = globSync(join(__dirname, "cases/**/*.{js,ts}")).filter(
     (file) => !file.endsWith(".mod.js") && !file.endsWith(".mod.ts")
   );
+  const onlyFiles = allFiles.filter(
+    (file) => file.endsWith(".only.js") || file.endsWith(".only.ts")
+  );
+  const files = onlyFiles.length > 0 ? onlyFiles : allFiles;
   for (let file of files) {
     describe(relative(`${__dirname}/cases`, file), async () => {
       const modFile = file

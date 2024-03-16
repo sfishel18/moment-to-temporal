@@ -1,14 +1,10 @@
 import moment from "moment";
 
-export const one = () => {
+export const noArguments = (): string => {
   return moment().toDate().toISOString();
 };
 
-export const two = () => {
-  return moment().add(1, "minutes").toDate().toISOString();
-};
-
-export const three = () => {
+export const yearFormat = () => {
   return moment("2018", ["YYYY"]).toDate().toISOString();
 };
 

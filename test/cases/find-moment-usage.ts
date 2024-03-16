@@ -9,4 +9,10 @@ export const indirectUsageSameScope = () => {
   return mmt().toDate().toISOString();
 };
 
+const mmt1 = moment;
+export const indirectUsageMultipleScopes = () => {
+  const mmt2 = mmt1;
+  return mmt2().toDate().toISOString();
+};
+
 export const expectNoMoment = true;
