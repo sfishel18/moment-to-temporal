@@ -21,7 +21,6 @@ export default (
   dateString: string,
   formats: string[]
 ): Temporal.ZonedDateTime => {
-  debugger;
   let date: Date = new Date(Number.NaN);
   for (let format of formats) {
     date = parse(dateString, mapFormatString(format), new Date());

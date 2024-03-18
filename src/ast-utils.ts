@@ -4,11 +4,38 @@ import {
   Collection,
   Identifier,
   ImportDefaultSpecifier,
-  ImportSpecifier,
   JSCodeshift,
 } from "jscodeshift";
 
-export const findAllReferences = (
+export const findAllReferencesShallow = (
+  identifier: ASTPath<Identifier>,
+  j: JSCodeshift
+): Collection<Identifier> =>
+  j(identifier)
+    .closestScope()
+    .find(j.Identifier, { name: identifier.node.name })
+    // exclude the original identifier
+    .filter((path) => path.node !== identifier.node)
+    // exclude references to a variable of the same name that shadows the original
+    .filter((path) => {
+      const bindingId = path.scope.lookup(path.node.name).bindings[
+        path.node.name
+      ][0];
+      return bindingId.node === identifier.node;
+    });
+
+const findReferenceAliases = (
+  identifier: ASTPath<Identifier>,
+  j: JSCodeshift
+): Collection<Identifier> =>
+  j([identifier])
+    .closest(
+      j.VariableDeclarator,
+      (declarator) => declarator.init === identifier.node
+    )
+    .find(j.Identifier, (aliasId) => aliasId !== identifier.node);
+
+const findAllReferences = (
   identifier: ASTPath<Identifier>,
   j: JSCodeshift
 ): Collection<Identifier> => {
@@ -19,23 +46,10 @@ export const findAllReferences = (
     if (!id) {
       continue;
     }
-    const localName = id.name;
-    const matchingIds = j(id)
-      .closestScope()
-      .find(j.Identifier, { name: localName })
-      .filter((path) => path !== id);
-
+    const matchingIds = findAllReferencesShallow(id, j);
     matchingIds.forEach((path) => {
-      const bindingId = path.scope.lookup(path.node.name).bindings[
-        path.node.name
-      ][0];
-      if (bindingId.node !== id) {
-        return;
-      }
       references.push(path);
-      const aliases = j([path])
-        .closest(j.VariableDeclarator, (node) => node.init === id.node)
-        .find(j.Identifier, (node) => node !== id.node);
+      const aliases = findReferenceAliases(path, j);
       idsToProcess.push(...aliases.paths());
     });
   }
@@ -47,29 +61,18 @@ export const removeUnusedReferences = (
   j: JSCodeshift
 ): Collection<Identifier> => {
   const unusedReferences = refs.filter((path) => {
-    const parentNode = path.parentPath.node;
-    if (
-      j.VariableDeclarator.check(parentNode) &&
-      parentNode.init === path.node &&
-      j.Identifier.check(parentNode.id)
-    ) {
-      return (
-        removeUnusedReferences(
-          // TODO: this function expects an import declaration,
-          // but we're sending it a variable declaration
-          findAllReferences(path.parentPath, j),
-          j
-        ).size() === 0
-      );
-    }
-    return false;
+    const aliases = findReferenceAliases(path, j);
+    const aliasReferences = aliases.map((aliasPath) =>
+      removeUnusedReferences(findAllReferencesShallow(aliasPath, j), j).paths()
+    );
+    return aliasReferences.size() === 0;
   });
-  unusedReferences.forEach((path) =>
-    j([path]).closest(j.VariableDeclaration).remove()
+  const usedReferenes = refs.filter(
+    (path) =>
+      !unusedReferences.some((unusedPath) => unusedPath.node === path.node)
   );
-  return refs.filter(
-    (path) => !unusedReferences.some((unusedPath) => unusedPath === path)
-  );
+  unusedReferences.closest(j.VariableDeclaration).remove();
+  return usedReferenes;
 };
 
 export const findAllMomentDefaultSpecifiers = (

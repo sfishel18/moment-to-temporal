@@ -1,4 +1,4 @@
-import j, {
+import {
   API,
   CallExpression,
   Collection,
@@ -16,7 +16,7 @@ import { last, once, uniq } from "lodash";
 import {
   findAllMomentDefaultSpecifiers,
   findAllMomentFactoryCalls,
-  findAllReferences,
+  findAllReferencesShallow,
   removeUnusedReferences,
 } from "./ast-utils";
 
@@ -223,7 +223,10 @@ export default function transform(
   findAllMomentDefaultSpecifiers(source, j)
     .find(j.Identifier)
     .forEach((path) => {
-      const references = removeUnusedReferences(findAllReferences(path, j), j);
+      const references = removeUnusedReferences(
+        findAllReferencesShallow(path, j),
+        j
+      );
       if (references.size() === 0) {
         j(path).closest(j.ImportDeclaration).remove();
       }
