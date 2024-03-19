@@ -65,7 +65,7 @@ export const removeUnusedReferences = (
     const aliasReferences = aliases.map((aliasPath) =>
       removeUnusedReferences(findAllReferencesShallow(aliasPath, j), j).paths()
     );
-    return aliasReferences.size() === 0;
+    return aliases.size() > 0 && aliasReferences.size() === 0;
   });
   const usedReferenes = refs.filter(
     (path) =>
