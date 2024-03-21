@@ -19,4 +19,8 @@ export const clippingToLastDayOfMonth = () => {
     .toISOString();
 };
 
+export const objectLiteralArguments = () => {
+  return moment().add({ minutes: 1 }).toDate().toISOString();
+};
+
 export const expectNoMoment = true;
