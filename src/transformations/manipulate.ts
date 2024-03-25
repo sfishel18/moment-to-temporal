@@ -84,7 +84,9 @@ const convertDurationArgs = (
         if (!convertedUnitArg) {
           return null;
         }
-        convertedProperties.push(j.property.from({ key, value, kind: "init" }));
+        convertedProperties.push(
+          j.property.from({ key: convertedUnitArg, value, kind: "init" })
+        );
       }
       return j.objectExpression.from({ properties: convertedProperties });
     }

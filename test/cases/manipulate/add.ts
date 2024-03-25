@@ -23,4 +23,8 @@ export const objectLiteralArguments = () => {
   return moment().add({ minutes: 1 }).toDate().toISOString();
 };
 
+export const objectLiteralMultipleArguments = () => {
+  return moment().add({ minutes: 1, h: 1, day: 1 }).toDate().toISOString();
+};
+
 export const expectNoMoment = true;
