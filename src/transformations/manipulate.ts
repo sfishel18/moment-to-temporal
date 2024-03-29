@@ -20,6 +20,7 @@ const unitConversionMap: Partial<Record<string, string>> = {
   hour: "hours",
   d: "days",
   day: "days",
+  date: "days",
   w: "weeks",
   week: "weeks",
   M: "months",
@@ -27,6 +28,8 @@ const unitConversionMap: Partial<Record<string, string>> = {
   y: "years",
   year: "years",
 };
+
+const notRoundableUnits = ["weeks", "months", "years"];
 
 const convertUnitArg = (
   unitArg: Literal | StringLiteral | Identifier,
@@ -119,6 +122,54 @@ const chainProcessors: Record<string, ChainProcessor> = {
         return null;
       }
       return j.template.expression`${next}.subtract(${convertedDuration})`;
+    },
+  },
+  startOf: {
+    process: (path, next, _, j) => {
+      const callee = path.node.callee;
+      if (!j.MemberExpression.check(callee)) {
+        return null;
+      }
+      const [unitArg] = path.node.arguments;
+      if (j.SpreadElement.check(unitArg)) {
+        return null;
+      }
+      if (!j.StringLiteral.check(unitArg) && !j.Literal.check(unitArg)) {
+        return null;
+      }
+      const convertedUnit = convertUnitArg(unitArg, j);
+      if (
+        !convertedUnit?.value ||
+        notRoundableUnits.includes(convertedUnit?.value)
+      ) {
+        return null;
+      }
+      return j.template
+        .expression`${next}.round({ smallestUnit: ${convertedUnit}, roundingMode: 'floor' })`;
+    },
+  },
+  endOf: {
+    process: (path, next, _, j) => {
+      const callee = path.node.callee;
+      if (!j.MemberExpression.check(callee)) {
+        return null;
+      }
+      const [unitArg] = path.node.arguments;
+      if (j.SpreadElement.check(unitArg)) {
+        return null;
+      }
+      if (!j.StringLiteral.check(unitArg) && !j.Literal.check(unitArg)) {
+        return null;
+      }
+      const convertedUnit = convertUnitArg(unitArg, j);
+      if (
+        !convertedUnit?.value ||
+        notRoundableUnits.includes(convertedUnit?.value)
+      ) {
+        return null;
+      }
+      return j.template
+        .expression`${next}.round({ smallestUnit: ${convertedUnit}, roundingMode: 'ceil' }).subtract({ milliseconds: 1 })`;
     },
   },
 };
