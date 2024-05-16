@@ -12,6 +12,10 @@ export default defineConfig({
         __dirname,
         "src/runtime/from-string.ts"
       ),
+      "moment-to-temporal/runtime/to-formatted-string": path.resolve(
+        __dirname,
+        "src/runtime/to-formatted-string.ts"
+      ),
     },
   },
 });

@@ -1,14 +1,7 @@
 import { Temporal, toTemporalInstant } from "@js-temporal/polyfill";
 import { parse } from "date-fns/parse";
 import InvalidZonedDateTime from "./InvalidZonedDateTime";
-
-const mapFormatString = (format: string): string =>
-  format
-    .split(/\[\]/)
-    .map((part, i) =>
-      i % 2 === 1 ? part : part.replace(/D/g, "d").replace(/YY/g, "yy")
-    )
-    .join("'");
+import { mapFormatString } from "./formatting-utils";
 
 const isValidDate = (date: Date): boolean => !Number.isNaN(date.getTime());
 

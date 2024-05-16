@@ -16,3 +16,10 @@ export const fromStringImport: (j: JSCodeshift) => ImportDeclaration = once(
     j.template
       .statement`import fromString from 'moment-to-temporal/runtime/from-string';`
 );
+
+export const toFormattedStringImport: (j: JSCodeshift) => ImportDeclaration =
+  once(
+    (j) =>
+      j.template
+        .statement`import toFormattedString from 'moment-to-temporal/runtime/to-formatted-string'`
+  );

@@ -1,5 +1,5 @@
 import { ChainProcessor } from "../types";
-import { toLegacyDateImport } from "./imports";
+import { toFormattedStringImport, toLegacyDateImport } from "./imports";
 
 const chainProcessors: Record<string, ChainProcessor> = {
   toDate: {
@@ -11,6 +11,18 @@ const chainProcessors: Record<string, ChainProcessor> = {
       }
       imports.push(toLegacyDateImport(j));
       return j.template.expression`toLegacyDate(${next})`;
+    },
+  },
+  format: {
+    isBreaking: true,
+    process: (path, next, imports, j) => {
+      const callee = path.node.callee;
+      if (!j.MemberExpression.check(callee)) {
+        return null;
+      }
+      imports.push(toFormattedStringImport(j));
+      const args = path.node.arguments;
+      return j.template.expression`toFormattedString(${next}, ${args[0]})`;
     },
   },
 };
