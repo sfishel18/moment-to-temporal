@@ -11,10 +11,10 @@ describe("all cases", () => {
   });
 
   const allFiles = globSync(join(__dirname, "cases/**/*.{js,ts}")).filter(
-    (file) => !file.endsWith(".mod.js") && !file.endsWith(".mod.ts")
+    (file) => !file.endsWith(".mod.js") && !file.endsWith(".mod.ts"),
   );
   const onlyFiles = allFiles.filter(
-    (file) => file.endsWith(".only.js") || file.endsWith(".only.ts")
+    (file) => file.endsWith(".only.js") || file.endsWith(".only.ts"),
   );
   const files = onlyFiles.length > 0 ? onlyFiles : allFiles;
   for (let file of files) {
@@ -26,8 +26,8 @@ describe("all cases", () => {
       execSync(
         `${join(__dirname, "../node_modules/.bin/hypermod")} -p ts -t ${join(
           __dirname,
-          "../src/transform.ts"
-        )} ${modFile}`
+          "../src/transform.ts",
+        )} ${modFile}`,
       );
       const expected = await import(file);
       const actual = await import(modFile);

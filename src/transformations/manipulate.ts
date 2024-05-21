@@ -33,7 +33,7 @@ const notRoundableUnits = ["weeks", "months", "years"];
 
 const convertUnitArg = (
   unitArg: Literal | StringLiteral | Identifier,
-  j: JSCodeshift
+  j: JSCodeshift,
 ): StringLiteral | null => {
   const value = j.Identifier.check(unitArg) ? unitArg.name : unitArg.value;
   if (typeof value !== "string") {
@@ -50,7 +50,7 @@ const convertUnitArg = (
 
 const convertDurationArgs = (
   args: CallExpression["arguments"],
-  j: JSCodeshift
+  j: JSCodeshift,
 ): ObjectExpression | null => {
   if (args.length === 2) {
     const [amountArg, unitArg] = args;
@@ -88,7 +88,7 @@ const convertDurationArgs = (
           return null;
         }
         convertedProperties.push(
-          j.property.from({ key: convertedUnitArg, value, kind: "init" })
+          j.property.from({ key: convertedUnitArg, value, kind: "init" }),
         );
       }
       return j.objectExpression.from({ properties: convertedProperties });

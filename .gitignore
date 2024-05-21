@@ -1,3 +1,4 @@
 node_modules
 test/**/*.mod.js
 test/**/*.mod.ts
+.vscode

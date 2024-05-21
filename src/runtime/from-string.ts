@@ -12,7 +12,7 @@ const fromLegacyDate = (date: Date): Temporal.ZonedDateTime =>
 
 export default (
   dateString: string,
-  formats: string[]
+  formats: string[],
 ): Temporal.ZonedDateTime => {
   let date: Date = new Date(Number.NaN);
   for (let format of formats) {

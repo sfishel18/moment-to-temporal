@@ -9,7 +9,7 @@ import { fromStringImport, pollyfillImport } from "./imports";
 export const processMomentFnCall = (
   path: ASTPath<CallExpression>,
   imports: ImportDeclaration[],
-  j: JSCodeshift
+  j: JSCodeshift,
 ): CallExpression | null => {
   const { arguments: initArgs } = path.node;
   if (initArgs.length === 0) {

@@ -6,7 +6,7 @@ export default {
     tailwindcss: {
       config: path.join(
         path.dirname(fileURLToPath(import.meta.url)),
-        "./tailwind.config.ts"
+        "./tailwind.config.ts",
       ),
     },
     autoprefixer: {},

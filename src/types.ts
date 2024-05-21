@@ -14,6 +14,6 @@ export type ChainProcessor = {
     path: ASTPath<CallExpression>,
     next: ExpressionObject,
     imports: ImportDeclaration[],
-    j: JSCodeshift
+    j: JSCodeshift,
   ) => ExpressionObject | null;
 };
