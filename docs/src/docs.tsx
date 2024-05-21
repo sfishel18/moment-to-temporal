@@ -1,4 +1,8 @@
+import { javascript } from '@codemirror/lang-javascript';
 import { debounce } from "@solid-primitives/scheduled";
+// @ts-ignore
+import { CodeMirror } from "@solid-codemirror/codemirror";
+import { minimalSetup } from "codemirror";
 import jsCodeShiftCore from "jscodeshift/src/core";
 import * as prettier from "prettier";
 import * as typescriptPlugin from "prettier/plugins/typescript";
@@ -30,20 +34,22 @@ const MainSection = () => {
   createEffect(() => debouncedSetOutput(input()));
   return (
     <section class="flex w-full px-6 py-8 space-x-2 h-screen">
-      <textarea
-        class="grow border-slate-500 border rounded p-2"
+      <CodeMirror
+        value={input()}
+        onValueChange={(val: string) => setInput(val)}
+        class="flex-1 border-slate-500 border rounded p-2"
         placeholder="Moment.js code goes here"
-        onKeyUp={(e) => setInput(e.currentTarget.value)}
-      >
-        {input()}
-      </textarea>
-      <textarea
-        class="grow border-slate-500 border rounded p-2"
-        placeholder="Temporal code will show up here"
-        readonly
-      >
-        {output()}
-      </textarea>
+        showLineNumbers={false}
+        extensions={[minimalSetup, javascript({ typescript: true })]}
+      />
+      <CodeMirror
+        value={output()}
+        class="flex-1 border-slate-500 border rounded p-2"
+        placeholder="Moment.js code goes here"
+        showLineNumbers={false}
+        readOnly
+        extensions={[minimalSetup, javascript({ typescript: true })]}
+      />
     </section>
   );
 };

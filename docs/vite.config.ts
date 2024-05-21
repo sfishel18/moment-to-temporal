@@ -7,4 +7,7 @@ export default defineConfig({
   define: {
     process: JSON.stringify({ env: {} }),
   },
+  optimizeDeps: {
+    include: ["@codemirror/state", "@codemirror/view"],
+  },
 });
