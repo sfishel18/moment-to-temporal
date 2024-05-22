@@ -5,7 +5,6 @@ description: File a bug relating to an incorrect code transformation
 title: "[Bug]: "
 
 body:
-
   - type: markdown
     attributes:
       value: |

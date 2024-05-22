@@ -1,4 +1,4 @@
-import { javascript } from '@codemirror/lang-javascript';
+import { javascript } from "@codemirror/lang-javascript";
 import { debounce } from "@solid-primitives/scheduled";
 // @ts-ignore
 import { CodeMirror } from "@solid-codemirror/codemirror";
@@ -33,24 +33,32 @@ const MainSection = () => {
   );
   createEffect(() => debouncedSetOutput(input()));
   return (
-    <section class="flex w-full px-6 py-8 space-x-2 h-screen">
-      <CodeMirror
-        value={input()}
-        onValueChange={(val: string) => setInput(val)}
-        class="flex-1 border-slate-500 border rounded p-2"
-        placeholder="Moment.js code goes here"
-        showLineNumbers={false}
-        extensions={[minimalSetup, javascript({ typescript: true })]}
-      />
-      <CodeMirror
-        value={output()}
-        class="flex-1 border-slate-500 border rounded p-2"
-        placeholder="Moment.js code goes here"
-        showLineNumbers={false}
-        readOnly
-        extensions={[minimalSetup, javascript({ typescript: true })]}
-      />
-    </section>
+    <>
+      <section class="flex w-full px-6 py-8 space-x-2 h-screen">
+        <CodeMirror
+          value={input()}
+          onValueChange={(val: string) => setInput(val)}
+          class="flex-1 border-slate-500 border rounded p-2"
+          placeholder="Moment.js code goes here"
+          showLineNumbers={false}
+          extensions={[minimalSetup, javascript({ typescript: true })]}
+        />
+        <CodeMirror
+          value={output()}
+          class="flex-1 border-slate-500 border rounded p-2"
+          placeholder="Moment.js code goes here"
+          showLineNumbers={false}
+          readOnly
+          extensions={[minimalSetup, javascript({ typescript: true })]}
+        />
+      </section>
+      <a
+        href={`https://github.com/sfishel18/moment-to-temporal/issues/new?template=bug-report.yml&title=%5BBug%5D%3A+&input=${encodeURIComponent(input())}&output=${encodeURIComponent(output())}`}
+        target="_blank"
+      >
+        File a bug!
+      </a>
+    </>
   );
 };
 
