@@ -16,6 +16,7 @@ body:
     attributes:
       label: Input
       placeholder: The Moment.js code that was passed to the transformer
+      render: ts
     validations:
       required: true
 
@@ -24,6 +25,7 @@ body:
     attributes:
       label: Output
       placeholder: The Temporal code that the transformer produced
+      render: ts
     validations:
       required: true
 
@@ -31,6 +33,8 @@ body:
     id: explanation
     attributes:
       label: Explain why this transformation is incorrect
+    validations:
+      required: true
 
   - type: textarea
     id: extra
