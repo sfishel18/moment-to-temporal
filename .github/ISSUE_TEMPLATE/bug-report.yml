@@ -1,6 +1,6 @@
-name: Bug Report
+name: Transformation Bug Report
 
-description: File a bug report.
+description: File a bug relating to an incorrect code transformation
 
 title: "[Bug]: "
 
@@ -14,18 +14,28 @@ body:
   - type: textarea
     id: input
     attributes:
-      label: Moment.js code
-      placeholder: Type it
+      label: Input
+      placeholder: The Moment.js code that was passed to the transformer
     validations:
       required: true
 
   - type: textarea
     id: output
     attributes:
-      label: Temporal code
-      placeholder: Type it
+      label: Output
+      placeholder: The Temporal code that the transformer produced
     validations:
       required: true
+
+  - type: textarea
+    id: explanation
+    attributes:
+      label: Explain why this transformation is incorrect
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else we should know?
 
   - type: input
     id: contact
