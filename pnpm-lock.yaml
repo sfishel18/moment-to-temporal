@@ -37,6 +37,9 @@ devDependencies:
   "@solid-primitives/scheduled":
     specifier: ^1.4.3
     version: 1.4.3(solid-js@1.8.17)
+  "@solidjs/router":
+    specifier: ^0.13.4
+    version: 0.13.4(solid-js@1.8.17)
   "@tsconfig/node20":
     specifier: ^20.1.2
     version: 20.1.2
@@ -79,9 +82,6 @@ devDependencies:
   tailwindcss:
     specifier: ^3.4.3
     version: 3.4.3(ts-node@10.9.2)
-  terracotta:
-    specifier: ^1.0.5
-    version: 1.0.5(solid-js@1.8.17)
   ts-node:
     specifier: ^10.9.2
     version: 10.9.2(@types/node@20.11.16)(typescript@5.3.3)
@@ -2644,6 +2644,17 @@ packages:
       }
     peerDependencies:
       solid-js: ^1.6.12
+    dependencies:
+      solid-js: 1.8.17
+    dev: true
+
+  /@solidjs/router@0.13.4(solid-js@1.8.17):
+    resolution:
+      {
+        integrity: sha512-UvL/8TkP3ExE/Z5KDs0wdqesWasISsRTrrredcTbxQx/eNdRXr8BXFsa3GV2f6VSQVjbukWG5cRAcIzV76nl/g==,
+      }
+    peerDependencies:
+      solid-js: ^1.8.6
     dependencies:
       solid-js: 1.8.17
     dev: true
@@ -6539,18 +6550,6 @@ packages:
       solid-js: 1.8.17
     dev: true
 
-  /solid-use@0.8.0(solid-js@1.8.17):
-    resolution:
-      {
-        integrity: sha512-YX+XmcKLvSx3bwMimMhFy40ZkDnShnUcEw6cW6fSscwKEgl1TG3GlgAvkBmQ3AeWjvQSd8+HGTr82ImsrjkkqA==,
-      }
-    engines: { node: ">=10" }
-    peerDependencies:
-      solid-js: ^1.7
-    dependencies:
-      solid-js: 1.8.17
-    dev: true
-
   /source-map-js@1.2.0:
     resolution:
       {
@@ -6824,19 +6823,6 @@ packages:
     engines: { node: ">=6.0.0" }
     dependencies:
       rimraf: 2.6.3
-
-  /terracotta@1.0.5(solid-js@1.8.17):
-    resolution:
-      {
-        integrity: sha512-4jkpXGKemeWjsBGDoBK1tnovGfIEMM8+Fa99T0TD4VYUaZq6hXHEWMfHshxy1h+DzsanDAwSBIBM0NnOohzijw==,
-      }
-    engines: { node: ">=10" }
-    peerDependencies:
-      solid-js: ^1.8
-    dependencies:
-      solid-js: 1.8.17
-      solid-use: 0.8.0(solid-js@1.8.17)
-    dev: true
 
   /thenify-all@1.6.0:
     resolution:
