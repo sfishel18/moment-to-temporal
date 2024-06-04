@@ -1,0 +1,29 @@
+name: Main Branch
+
+on:
+  push:
+    branches: 
+      - main
+
+jobs:
+  publish-pages:
+    runs-on: ubuntu-20.04
+    environment:
+      name: github-pages
+      url: ${{steps.deployment.outputs.page_url}}
+    steps:
+    - uses: actions/checkout@v3
+    - uses: pnpm/action-setup@v2
+      with:
+        version: 8.8.0
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 20.8.0
+        cache: 'pnpm'
+    - name: Install dependencies
+      run: pnpm install
+    - name: Build docs
+      run: pnpm run docs:build --outDir ./_site
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v2

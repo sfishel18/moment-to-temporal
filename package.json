@@ -6,7 +6,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "docs": "vite --config docs/vite.config.ts"
+    "docs": "vite --config docs/vite.config.ts",
+    "docs:build": "vite --config docs/vite.config.ts build"
   },
   "keywords": [],
   "author": "",
