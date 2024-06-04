@@ -3,6 +3,7 @@ import solidPlugin from "vite-plugin-solid";
 
 export default defineConfig({
   root: __dirname,
+  base: "./",
   plugins: [solidPlugin()],
   define: {
     process: JSON.stringify({ env: {} }),
