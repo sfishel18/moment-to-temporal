@@ -28,7 +28,11 @@ jobs:
     - name: Install dependencies
       run: pnpm install
     - name: Build docs
-      run: pnpm run docs:build --outDir ./_site
+      run: pnpm run docs:build 
+    - name: Upload Github Pages artifact
+      uses: actions/upload-pages-artifact@v2
+      with:
+        path: docs/dist
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v2
