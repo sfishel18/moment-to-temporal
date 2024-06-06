@@ -13,6 +13,16 @@ const chainProcessors: Record<string, ChainProcessor> = {
       return j.template.expression`toLegacyDate(${next})`;
     },
   },
+  toISOString: {
+    isBreaking: true,
+    process: (path, next, _, j) => {
+      const callee = path.node.callee;
+      if (!j.MemberExpression.check(callee)) {
+        return null;
+      }
+      return j.template.expression`${next}.toString()`;
+    },
+  },
   format: {
     isBreaking: true,
     process: (path, next, imports, j) => {

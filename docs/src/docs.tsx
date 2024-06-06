@@ -70,8 +70,12 @@ const AppShell = (props: { children: JSX.Element }) => (
   </div>
 );
 
+const initialInput = `import moment from 'moment';
+
+const nowIso = moment().toDate().toISOString();`
+
 const Explorer = () => {
-  const [input, setInput] = createSignal("");
+  const [input, setInput] = createSignal(initialInput);
   const [output, setOutput] = createSignal("");
   const debouncedSetOutput = debounce(
     (source: string) => transpile(source).then(setOutput),
