@@ -1,6 +1,6 @@
 {
   "name": "moment-to-temporal",
-  "version": "0.2.0-test.6",
+  "version": "0.2.0",
   "description": "",
   "files": [
     "lib/**"
