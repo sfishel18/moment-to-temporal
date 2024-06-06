@@ -24,7 +24,7 @@ import { processMomentFnCall } from "./transformations/parse";
 const addImports = (
   source: Collection<unknown>,
   imports: ImportDeclaration[],
-  j: JSCodeshift,
+  j: JSCodeshift
 ) => {
   const file = source.isOfType(j.File) ? (source as Collection<File>) : null;
   file?.nodes()[0]?.program.body.unshift(...uniq(imports));
@@ -58,7 +58,7 @@ const invocationToChain = (path: ASTPath<CallExpression>, j: JSCodeshift) => {
 
 const getChainCallName = (
   node: CallExpression,
-  j: JSCodeshift,
+  j: JSCodeshift
 ): string | null => {
   if (
     j.MemberExpression.check(node.callee) &&
@@ -72,7 +72,7 @@ const getChainCallName = (
 const processInvocation = (
   path: ASTPath<CallExpression>,
   imports: ImportDeclaration[],
-  j: JSCodeshift,
+  j: JSCodeshift
 ): boolean => {
   const chain = invocationToChain(path, j);
   const initReplacement = processMomentFnCall(chain.init, imports, j);
@@ -88,7 +88,7 @@ const processInvocation = (
   }
   const subChain = chain.chains.slice(
     0,
-    chain.chains.indexOf(chainBreaker) + 1,
+    chain.chains.indexOf(chainBreaker) + 1
   );
   let outermostCall: ExpressionObject | null = initReplacement;
   subChain.forEach((path) => {
@@ -110,7 +110,7 @@ const processInvocation = (
 export default function transform(
   file: FileInfo,
   { j }: API,
-  options: Options,
+  options: Options
 ) {
   const source = j(file.source);
   const invocations = findAllMomentFactoryCalls(source, j);
@@ -128,11 +128,11 @@ export default function transform(
     .forEach((path) => {
       const references = removeUnusedReferences(
         findAllReferencesShallow(path, j),
-        j,
+        j
       );
       if (references.size() === 0) {
         j(path).closest(j.ImportDeclaration).remove();
       }
     });
-  return source.toSource(options.printOptions);
+  return source.toSource(options["printOptions"]);
 }

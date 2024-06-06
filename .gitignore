@@ -3,3 +3,4 @@ test/**/*.mod.js
 test/**/*.mod.ts
 .vscode
 docs/dist
+lib
