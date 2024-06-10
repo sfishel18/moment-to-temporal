@@ -10,6 +10,7 @@ import {
   ImportDeclaration,
 } from "jscodeshift";
 import { last, uniq } from "lodash";
+import fs from "node:fs";
 import {
   findAllMomentDefaultSpecifiers,
   findAllMomentFactoryCalls,
@@ -20,6 +21,7 @@ import { ChainProcessor, ExpressionObject } from "./types";
 import displayChainProcessors from "./transformations/display";
 import manipulateChainProcessors from "./transformations/manipulate";
 import { processMomentFnCall } from "./transformations/parse";
+import { importDependencyMap, allImports } from "./transformations/imports";
 
 const addImports = (
   source: Collection<unknown>,
@@ -134,5 +136,23 @@ export default function transform(
         j(path).closest(j.ImportDeclaration).remove();
       }
     });
+
+  if (options["resultFilePath"]) {
+    fs.writeFileSync(
+      options["resultFilePath"],
+      JSON.stringify({
+        importsAdded: uniq(
+          imports.flatMap((i) => {
+            const matchingFactory = allImports.find((f) => f(j) === i);
+            return importDependencyMap.get(matchingFactory) || [];
+          })
+        ),
+      }),
+      {
+        encoding: "utf-8",
+      }
+    );
+    options["importsAdded"]?.("aha");
+  }
   return source.toSource(options["printOptions"]);
 }

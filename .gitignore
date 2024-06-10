@@ -4,3 +4,4 @@ test/**/*.mod.ts
 .vscode
 docs/dist
 lib
+bin/result.json
