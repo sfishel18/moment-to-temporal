@@ -1,7 +1,21 @@
 {
   "name": "moment-to-temporal",
-  "version": "0.3.0",
-  "description": "",
+  "version": "0.3.1",
+  "description": "A codemod to transform your Moment.js code into Temporal API code",
+  "keywords": [
+    "moment",
+    "date",
+    "time",
+    "temporal",
+    "codemod",
+    "jscodeshift"
+  ],
+  "homepage": "https://sfishel18.github.io/moment-to-temporal",
+  "bugs": "https://github.com/sfishel18/moment-to-temporal/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sfishel18/moment-to-temporal.git"
+  },
   "files": [
     "lib/**"
   ],
@@ -12,7 +26,6 @@
     "docs:build": "vite --config docs/vite.config.ts build"
   },
   "bin": "bin/cli.cjs",
-  "keywords": [],
   "author": "",
   "license": "MIT",
   "devDependencies": {

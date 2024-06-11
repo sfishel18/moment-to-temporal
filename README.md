@@ -1,6 +1,6 @@
 # Moment to Temporal
 
-A code-mod to transform your Moment.js code into Temporal API code.
+A codemod to transform your Moment.js code into Temporal API code.
 
 ## About
 
@@ -10,7 +10,7 @@ Replacing Moment.js with the Temporal API is a compelling idea for several reaso
 
 ## CLI Usage
 
-To apply the code-mod to your code base, simply run:
+To apply the codemod to your code base, simply run:
 
 ```
 npx moment-to-temporal <path/to/source/>
