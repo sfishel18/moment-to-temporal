@@ -10,6 +10,8 @@ const resultFilePath = path.resolve(__dirname, "result.json");
 
 jscodeshift(transformPath, [process.argv[2]], {
   silent: true,
+  extensions: "js,jsx,ts,tsx",
+  parser: "tsx",
   resultFilePath,
 }).then((result) => {
   if (result.ok === 0) {
@@ -28,7 +30,7 @@ jscodeshift(transformPath, [process.argv[2]], {
   } catch (e) {}
 
   if (customResult.importsAdded?.length > 0) {
-    console.log("You will need to install the following modules from NPM:");
+    console.log("\r\nYou will need to install the following modules from NPM:");
     customResult.importsAdded.forEach((i) => {
       console.log(`  * ${i}`);
     });

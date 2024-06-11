@@ -34,12 +34,6 @@ export const allImports = [
 export const importDependencyMap: Map<unknown, string[]> = new Map([
   [pollyfillImport, ["@js-temporal/polyfill"]],
   [toLegacyDateImport, ["@js-temporal/polyfill", "moment-to-temporal"]],
-  [
-    fromStringImport,
-    ["@js-temporal/polyfill", "moment-to-temporal", "date-fns"],
-  ],
-  [
-    toFormattedStringImport,
-    ["@js-temporal/polyfill", "moment-to-temporal", "date-fns"],
-  ],
+  [fromStringImport, ["@js-temporal/polyfill", "moment-to-temporal"]],
+  [toFormattedStringImport, ["@js-temporal/polyfill", "moment-to-temporal"]],
 ]);
