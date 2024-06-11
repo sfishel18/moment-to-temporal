@@ -1,4 +1,5 @@
 import { javascript } from "@codemirror/lang-javascript";
+import * as Sentry from "@sentry/browser";
 import { debounce } from "@solid-primitives/scheduled";
 // @ts-ignore
 import { CodeMirror } from "@solid-codemirror/codemirror";
@@ -13,6 +14,18 @@ import transform from "../../src/transform";
 // @ts-ignore
 import icon from "../assets/icon.png";
 import "./docs.css";
+
+Sentry.init({
+  dsn: "https://55cf199bb7f25e45b9eea80250d571ce@o1208652.ingest.us.sentry.io/4507415527620608",
+  integrations: [
+    Sentry.browserTracingIntegration(),
+    Sentry.replayIntegration(),
+  ],
+  tracesSampleRate: 1.0,
+  tracePropagationTargets: ["localhost", /^https:\/\/sfishel18.github.io\/moment-to-temporal/],
+  replaysSessionSampleRate: 0.1,
+  replaysOnErrorSampleRate: 1.0,
+});
 
 function classNames(...classes: (string | boolean | undefined)[]): string {
   return classes.filter(Boolean).join(" ");
