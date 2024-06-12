@@ -19,13 +19,13 @@ jscodeshift(transformPath, [process.argv[2]], {
   }
   console.log(
     "Tranformation complete!",
-    result.ok === 1 ? "1 file updated." : `${result.ok} files updated.`
+    result.ok === 1 ? "1 file updated." : `${result.ok} files updated.`,
   );
 
   let customResult = {};
   try {
     customResult = JSON.parse(
-      fs.readFileSync(resultFilePath, { encoding: "utf-8" })
+      fs.readFileSync(resultFilePath, { encoding: "utf-8" }),
     );
   } catch (e) {}
 
