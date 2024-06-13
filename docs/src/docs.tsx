@@ -12,10 +12,8 @@ import { createSignal, createEffect, JSX, onMount, onCleanup } from "solid-js";
 import { SolidMarkdown } from "solid-markdown";
 import { render } from "solid-js/web";
 import transform from "../../src/transform";
-// @ts-ignore
 import icon from "../assets/icon.png";
 import GithubIcon from "./github-icon";
-// @ts-ignore
 import { plainText as readmeText } from "../../README.md";
 import "./docs.css";
 
@@ -128,23 +126,31 @@ const Explorer = () => {
           If your code doesn't get fully transformed, use the "File an issue"
           button below to create a pre-populated issue!
         </h3>
-        <div class="flex flex-auto w-full h-full py-8 space-x-2">
-          <CodeMirror
-            value={input()}
-            onValueChange={(val: string) => setInput(val)}
-            class={`flex-1 border-sky-900 border rounded p-2 bg-white`}
-            placeholder="Moment.js code goes here"
-            showLineNumbers={false}
-            extensions={[minimalSetup, javascript({ typescript: true })]}
-          />
-          <CodeMirror
-            value={output()}
-            class={`flex-1 border-sky-900 border rounded p-2 bg-white`}
-            placeholder="Moment.js code goes here"
-            showLineNumbers={false}
-            readOnly
-            extensions={[minimalSetup, javascript({ typescript: true })]}
-          />
+        <div class="flex flex-auto w-full h-full py-6 space-x-2">
+          <div class="flex flex-col flex-1">
+            <div class="bg-sky-900 text-white border-sky-900 border rounded-t px-4 py-2">
+              Moment.js code goes in here...
+            </div>
+            <CodeMirror
+              value={input()}
+              onValueChange={(val: string) => setInput(val)}
+              class="flex-1 border-sky-900 border rounded-b p-2 bg-white"
+              showLineNumbers={false}
+              extensions={[minimalSetup, javascript({ typescript: true })]}
+            />
+          </div>
+          <div class="flex flex-col flex-1">
+            <div class="bg-sky-900 text-white border-sky-900 border rounded-t px-4 py-2">
+              ...and Temporal code comes out here
+            </div>
+            <CodeMirror
+              value={output()}
+              class="flex-1 border-sky-900 border rounded-b p-2 bg-white"
+              showLineNumbers={false}
+              readOnly
+              extensions={[minimalSetup, javascript({ typescript: true })]}
+            />
+          </div>
         </div>
         <div class="flex justify-center items-center">
           <p class="mr-4">Output doesn't look right?</p>
