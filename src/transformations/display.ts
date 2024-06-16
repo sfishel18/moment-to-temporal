@@ -1,3 +1,4 @@
+import { annotatePath } from "../ast-utils";
 import { ChainProcessor } from "../types";
 import { toFormattedStringImport, toLegacyDateImport } from "./imports";
 
@@ -7,6 +8,11 @@ const chainProcessors: Record<string, ChainProcessor> = {
     process: (path, next, imports, j) => {
       const callee = path.node.callee;
       if (!j.MemberExpression.check(callee)) {
+        annotatePath(
+          path,
+          `failed to transform \`toDate\`: not called as a member function`,
+          j
+        );
         return null;
       }
       imports.push(toLegacyDateImport(j));
@@ -18,9 +24,15 @@ const chainProcessors: Record<string, ChainProcessor> = {
     process: (path, next, _, j) => {
       const callee = path.node.callee;
       if (!j.MemberExpression.check(callee)) {
+        annotatePath(
+          path,
+          `failed to transform \`toISOString\`: not called as a member function`,
+          j
+        );
         return null;
       }
-      return j.template.expression`${next}.toString()`;
+      return j.template
+        .expression`${next}.toInstant().round({ smallestUnit: 'millisecond', roundingMode: 'floor' }).toString()`;
     },
   },
   format: {
@@ -28,6 +40,11 @@ const chainProcessors: Record<string, ChainProcessor> = {
     process: (path, next, imports, j) => {
       const callee = path.node.callee;
       if (!j.MemberExpression.check(callee)) {
+        annotatePath(
+          path,
+          `failed to transform \`format\`: not called as a member function`,
+          j
+        );
         return null;
       }
       imports.push(toFormattedStringImport(j));

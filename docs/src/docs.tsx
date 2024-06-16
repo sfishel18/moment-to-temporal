@@ -106,7 +106,7 @@ const AppShell = (props: { children: JSX.Element }) => (
 const inputLocalStorageKey = "M2T_input";
 const initialInput = `import moment from 'moment';
 
-const nowIso = moment().toDate().toISOString();`;
+const nowIso = moment().toISOString();`;
 
 const Explorer = () => {
   const [input, setInput] = createSignal(
