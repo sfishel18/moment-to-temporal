@@ -20,8 +20,8 @@
     "lib/**"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "pnpm exec tsc -p ./tsconfig.build.json",
+    "test": "vitest --run",
+    "build": "tsc -p ./tsconfig.build.json",
     "docs": "vite --config docs/vite.config.ts",
     "docs:build": "vite --config docs/vite.config.ts build"
   },

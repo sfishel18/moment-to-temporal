@@ -103,17 +103,20 @@ const AppShell = (props: { children: JSX.Element }) => (
   </div>
 );
 
+const inputLocalStorageKey = "M2T_input";
 const initialInput = `import moment from 'moment';
 
 const nowIso = moment().toDate().toISOString();`;
 
 const Explorer = () => {
-  const [input, setInput] = createSignal(initialInput);
-  const [output, setOutput] = createSignal("");
-  const debouncedSetOutput = debounce(
-    (source: string) => transpile(source).then(setOutput),
-    250,
+  const [input, setInput] = createSignal(
+    localStorage.getItem(inputLocalStorageKey) || initialInput,
   );
+  const [output, setOutput] = createSignal("");
+  const debouncedSetOutput = debounce((source: string) => {
+    localStorage.setItem(inputLocalStorageKey, source);
+    transpile(source).then(setOutput);
+  }, 250);
   createEffect(() => debouncedSetOutput(input()));
   return (
     <AppShell>
