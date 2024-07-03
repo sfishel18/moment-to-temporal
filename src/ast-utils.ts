@@ -10,7 +10,7 @@ import {
 
 export const findAllReferencesShallow = (
   identifier: ASTPath<Identifier>,
-  j: JSCodeshift
+  j: JSCodeshift,
 ): Collection<Identifier> =>
   j(identifier)
     .closestScope()
@@ -27,18 +27,18 @@ export const findAllReferencesShallow = (
 
 const findReferenceAliases = (
   identifier: ASTPath<Identifier>,
-  j: JSCodeshift
+  j: JSCodeshift,
 ): Collection<Identifier> =>
   j([identifier])
     .closest(
       j.VariableDeclarator,
-      (declarator) => declarator.init === identifier.node
+      (declarator) => declarator.init === identifier.node,
     )
     .find(j.Identifier, (aliasId) => aliasId !== identifier.node);
 
 const findAllReferences = (
   identifier: ASTPath<Identifier>,
-  j: JSCodeshift
+  j: JSCodeshift,
 ): Collection<Identifier> => {
   const idsToProcess = [identifier];
   const references: ASTPath<Identifier>[] = [];
@@ -59,18 +59,18 @@ const findAllReferences = (
 
 export const removeUnusedReferences = (
   refs: Collection<Identifier>,
-  j: JSCodeshift
+  j: JSCodeshift,
 ): Collection<Identifier> => {
   const unusedReferences = refs.filter((path) => {
     const aliases = findReferenceAliases(path, j);
     const aliasReferences = aliases.map((aliasPath) =>
-      removeUnusedReferences(findAllReferencesShallow(aliasPath, j), j).paths()
+      removeUnusedReferences(findAllReferencesShallow(aliasPath, j), j).paths(),
     );
     return aliases.size() > 0 && aliasReferences.size() === 0;
   });
   const usedReferenes = refs.filter(
     (path) =>
-      !unusedReferences.some((unusedPath) => unusedPath.node === path.node)
+      !unusedReferences.some((unusedPath) => unusedPath.node === path.node),
   );
   unusedReferences.closest(j.VariableDeclaration).remove();
   return usedReferenes;
@@ -78,7 +78,7 @@ export const removeUnusedReferences = (
 
 export const findAllMomentDefaultSpecifiers = (
   source: Collection<unknown>,
-  j: JSCodeshift
+  j: JSCodeshift,
 ): Collection<ImportDefaultSpecifier> =>
   source
     .find(j.ImportDeclaration)
@@ -87,21 +87,21 @@ export const findAllMomentDefaultSpecifiers = (
 
 export const findAllMomentFactoryCalls = (
   source: Collection<unknown>,
-  j: JSCodeshift
+  j: JSCodeshift,
 ): Collection<CallExpression> => {
   const specifiers = findAllMomentDefaultSpecifiers(source, j);
   const references = specifiers.find(j.Identifier).map((path) => {
     return findAllReferences(path, j).paths();
   });
   return references.map((path) =>
-    j.CallExpression.check(path.parentPath.node) ? path.parentPath : null
+    j.CallExpression.check(path.parentPath.node) ? path.parentPath : null,
   );
 };
 
 export const annotatePath = (
   path: ASTPath<Node>,
   annotation: string,
-  j: JSCodeshift
+  j: JSCodeshift,
 ): void => {
   const comment = j.commentBlock(` [from moment-to-temporal] ${annotation}. `);
   path.node.comments = [...(path.node.comments || []), comment];

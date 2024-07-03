@@ -38,7 +38,7 @@ const notRoundableUnits = ["weeks", "months", "years"];
 
 const convertUnitArg = (
   unitArg: Literal | StringLiteral | Identifier,
-  j: JSCodeshift
+  j: JSCodeshift,
 ): Result<StringLiteral> => {
   const value = j.Identifier.check(unitArg) ? unitArg.name : unitArg.value;
   if (typeof value !== "string") {
@@ -55,7 +55,7 @@ const convertUnitArg = (
 
 const convertDurationArgs = (
   args: CallExpression["arguments"],
-  j: JSCodeshift
+  j: JSCodeshift,
 ): Result<ObjectExpression> => {
   if (args.length === 2) {
     const [amountArg, unitArg] = args;
@@ -100,7 +100,7 @@ const convertDurationArgs = (
             key: convertedUnitArg.result,
             value,
             kind: "init",
-          })
+          }),
         );
       }
       return {
@@ -119,7 +119,7 @@ const chainProcessors: Record<string, ChainProcessor> = {
         annotatePath(
           path,
           `failed to transform \`add\`: not called as a member function`,
-          j
+          j,
         );
         return null;
       }
@@ -128,7 +128,7 @@ const chainProcessors: Record<string, ChainProcessor> = {
         annotatePath(
           path,
           `failed to transform \`add\`: ${convertedDuration.failedReason}`,
-          j
+          j,
         );
         return null;
       }
@@ -142,7 +142,7 @@ const chainProcessors: Record<string, ChainProcessor> = {
         annotatePath(
           path,
           `failed to transform \`subtract\`: not called as a member function`,
-          j
+          j,
         );
         return null;
       }
@@ -151,7 +151,7 @@ const chainProcessors: Record<string, ChainProcessor> = {
         annotatePath(
           path,
           `failed to transform \`subtract\`: ${convertedDuration.failedReason}`,
-          j
+          j,
         );
         return null;
       }
@@ -166,7 +166,7 @@ const chainProcessors: Record<string, ChainProcessor> = {
         annotatePath(
           path,
           `failed to transform \`startOf\`: not called as a member function`,
-          j
+          j,
         );
         return null;
       }
@@ -175,7 +175,7 @@ const chainProcessors: Record<string, ChainProcessor> = {
         annotatePath(
           path,
           `failed to transform \`startOf\`: spread operator not supported`,
-          j
+          j,
         );
         return null;
       }
@@ -183,7 +183,7 @@ const chainProcessors: Record<string, ChainProcessor> = {
         annotatePath(
           path,
           `failed to transform \`startOf\`: unit is not a string literal`,
-          j
+          j,
         );
         return null;
       }
@@ -192,7 +192,7 @@ const chainProcessors: Record<string, ChainProcessor> = {
         annotatePath(
           path,
           `failed to transform \`startOf\`: ${convertedUnit.failedReason}`,
-          j
+          j,
         );
         return null;
       }
@@ -203,7 +203,7 @@ const chainProcessors: Record<string, ChainProcessor> = {
         annotatePath(
           path,
           `failed to transform \`startOf\`: unit "${convertedUnit.result.value}" does not support rounding`,
-          j
+          j,
         );
         return null;
       }
@@ -218,7 +218,7 @@ const chainProcessors: Record<string, ChainProcessor> = {
         annotatePath(
           path,
           `failed to transform \`endOf\`: not called as a member function`,
-          j
+          j,
         );
         return null;
       }
@@ -227,7 +227,7 @@ const chainProcessors: Record<string, ChainProcessor> = {
         annotatePath(
           path,
           `failed to transform \`endOf\`: spread operator not supported`,
-          j
+          j,
         );
         return null;
       }
@@ -235,7 +235,7 @@ const chainProcessors: Record<string, ChainProcessor> = {
         annotatePath(
           path,
           `failed to transform \`endOf\`: unit is not a string literal`,
-          j
+          j,
         );
         return null;
       }
@@ -244,7 +244,7 @@ const chainProcessors: Record<string, ChainProcessor> = {
         annotatePath(
           path,
           `failed to transform \`endOf\`: ${convertedUnit.failedReason}`,
-          j
+          j,
         );
         return null;
       }
@@ -255,7 +255,7 @@ const chainProcessors: Record<string, ChainProcessor> = {
         annotatePath(
           path,
           `failed to transform \`endOf\`: unit "${convertedUnit.result.value}" does not support rounding`,
-          j
+          j,
         );
         return null;
       }

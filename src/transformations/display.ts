@@ -11,7 +11,7 @@ const chainProcessors: Record<string, ChainProcessor> = {
         annotatePath(
           path,
           `failed to transform \`toDate\`: not called as a member function`,
-          j
+          j,
         );
         return null;
       }
@@ -27,7 +27,7 @@ const chainProcessors: Record<string, ChainProcessor> = {
         annotatePath(
           path,
           `failed to transform \`toISOString\`: not called as a member function`,
-          j
+          j,
         );
         return null;
       }
@@ -43,7 +43,7 @@ const chainProcessors: Record<string, ChainProcessor> = {
         annotatePath(
           path,
           `failed to transform \`format\`: not called as a member function`,
-          j
+          j,
         );
         return null;
       }
