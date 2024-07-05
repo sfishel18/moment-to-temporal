@@ -19,15 +19,15 @@ export default defineConfig({
       timers: "identity-obj-proxy",
       "moment-to-temporal/runtime/to-legacy-date": path.resolve(
         __dirname,
-        "../src/runtime/to-legacy-date.ts"
+        "../src/runtime/to-legacy-date.ts",
       ),
       "moment-to-temporal/runtime/from-string": path.resolve(
         __dirname,
-        "../src/runtime/from-string.ts"
+        "../src/runtime/from-string.ts",
       ),
       "moment-to-temporal/runtime/to-formatted-string": path.resolve(
         __dirname,
-        "../src/runtime/to-formatted-string.ts"
+        "../src/runtime/to-formatted-string.ts",
       ),
     },
   },

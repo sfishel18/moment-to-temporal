@@ -5,7 +5,6 @@ import "./docs.css";
 import { Explorer } from "./components/Explorer";
 import { About } from "./components/About";
 
-
 if (!Sentry.isInitialized()) {
   Sentry.init({
     dsn: "https://55cf199bb7f25e45b9eea80250d571ce@o1208652.ingest.us.sentry.io/4507415527620608",
@@ -22,7 +21,6 @@ if (!Sentry.isInitialized()) {
     replaysOnErrorSampleRate: 1.0,
   });
 }
-
 
 const MainSection = () => {
   const [fragment, setFragment] = createSignal("");

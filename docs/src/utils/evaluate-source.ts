@@ -10,7 +10,7 @@ const worker = new Worker(new URL("./eval-worker.ts", import.meta.url), {
 const j = jsCodeShiftCore.withParser("ts");
 
 export const evaluateSource = async (
-  input: SourceWithTimestamp
+  input: SourceWithTimestamp,
 ): Promise<string> => {
   if (!input.source) {
     return "";
@@ -18,7 +18,7 @@ export const evaluateSource = async (
   const prepped = evalPrepTransform(
     { source: input.source } as any,
     { j } as any,
-    {}
+    {},
   );
   const messageId = uniqueId("worker-message-");
   return new Promise((res) => {
@@ -31,7 +31,11 @@ export const evaluateSource = async (
     };
     worker.addEventListener("message", onWorkerMessage);
     worker.postMessage(
-      JSON.stringify({ messageId, source: prepped, timestamp: input.timestamp })
+      JSON.stringify({
+        messageId,
+        source: prepped,
+        timestamp: input.timestamp,
+      }),
     );
   });
 };

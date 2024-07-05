@@ -19,12 +19,12 @@ self.addEventListener("message", (e) => {
     toLegacyDate,
     fromString,
     self,
-    importScripts
+    importScripts,
   ) => {
     try {
       result = eval(`${source}`);
     } catch (e) {
-      // pass
+      console.error(e);
     }
   })(moment, Temporal, toFormattedString, toLegacyDate, fromString);
   self.postMessage(JSON.stringify({ messageId, result }));

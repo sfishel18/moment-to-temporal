@@ -16,10 +16,6 @@ export const processMomentFnCall = (
     imports.push(pollyfillImport(j));
     return j.template.expression`Temporal.Now.zonedDateTimeISO()`;
   }
-  if (initArgs.length === 2) {
-    imports.push(fromStringImport(j));
-    return j.template.expression`fromString(${initArgs})`;
-  }
-
-  return null;
+  imports.push(fromStringImport(j));
+  return j.template.expression`fromString(${initArgs})`;
 };
