@@ -1,14 +1,16 @@
 {
   "name": "moment-to-temporal",
   "version": "0.3.1",
-  "description": "A codemod to transform your Moment.js code into Temporal API code",
+  "description": "A codemod to transform date and time manipulation logic from Moment.js code into Temporal API code. Written with JSCodeshift, supports JavaScript and TypeScript",
   "keywords": [
     "moment",
     "date",
     "time",
     "temporal",
     "codemod",
-    "jscodeshift"
+    "jscodeshift",
+    "javascript",
+    "typescript"
   ],
   "homepage": "https://sfishel18.github.io/moment-to-temporal",
   "bugs": "https://github.com/sfishel18/moment-to-temporal/issues",

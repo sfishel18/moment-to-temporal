@@ -2,6 +2,10 @@ import path from "path";
 import { defineConfig } from "vite";
 import solidPlugin from "vite-plugin-solid";
 import plainText from "vite-plugin-plain-text";
+import packageJson from '../package.json';
+
+process.env.VITE_META_DESCRIPTION = packageJson.description;
+process.env.VITE_META_KEYWORDS = packageJson.keywords.join(', ');
 
 export default defineConfig({
   root: __dirname,
