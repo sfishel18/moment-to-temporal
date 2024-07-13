@@ -12,6 +12,7 @@ import {
 import { last, uniq } from "lodash";
 import fs from "node:fs";
 import {
+  annotatePath,
   findAllMomentDefaultSpecifiers,
   findAllMomentFactoryCalls,
   findAllReferencesShallow,
@@ -86,6 +87,7 @@ const processInvocation = (
     return name && chainProcessors[name]?.isBreaking;
   });
   if (!chainBreaker) {
+    annotatePath(path, 'only expressions that evaluate to a primitive or Date can be transformed', j)
     return false;
   }
   const subChain = chain.chains.slice(
@@ -93,12 +95,15 @@ const processInvocation = (
     chain.chains.indexOf(chainBreaker) + 1,
   );
   let outermostCall: ExpressionObject | null = initReplacement;
-  subChain.forEach((path) => {
-    const name = getChainCallName(path.node, j);
+  subChain.forEach((subChainPath) => {
+    const name = getChainCallName(subChainPath.node, j);
     if (name && outermostCall && chainProcessors[name]) {
       outermostCall =
-        chainProcessors[name]?.process(path, outermostCall, imports, j) || null;
+        chainProcessors[name]?.process(subChainPath, outermostCall, imports, j) || null;
     } else {
+      if (name && !chainProcessors[name]) {
+        annotatePath(subChainPath, `the "${name}" method is not yet supported`, j)
+      }
       outermostCall = null;
     }
   });
