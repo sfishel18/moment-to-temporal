@@ -150,12 +150,12 @@ ${JSON.stringify(outputResult())}
           </div>
         </div>
         <div class="flex justify-center items-center">
-          <p class="mr-4">Output doesn't look right?</p>
+          <p class="mr-2">Output doesn't look right?</p>
           <a
             class={classNames(
-              `py-1 px-2 ring-2 rounded ring-sky-900 text-sky-900`,
-              `focus:outline-none focus:ring-2 focus:text-sky-500 focus:ring-sky-500`,
-              `hover:text-sky-500 hover:ring-2 hover:ring-sky-500`,
+              `font-bold py-2 px-4 rounded-3xl`,
+              `bg-sky-900 text-white`,
+              `hover:bg-sky-500`,
             )}
             href={bugReportUrl()}
             target="_blank"
