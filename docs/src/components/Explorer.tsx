@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/browser";
 import { createSignal, createEffect } from "solid-js";
 import { javascript } from "@codemirror/lang-javascript";
 import { debounce } from "@solid-primitives/scheduled";
@@ -64,6 +65,43 @@ export const Explorer = () => {
     return "pending";
   };
 
+  const bugReportUrl = (): string => {
+    let url = 'https://github.com/sfishel18/moment-to-temporal/issues/new?'
+    url += [
+      `template=bug-report.yml&title=${encodeURIComponent('[Bug]:')}`,
+      `input=${encodeURIComponent(input().source)}`,
+      `output=${encodeURIComponent(output().source)}`]
+      .join('&')
+    if (outputMatch() === 'no-match') {
+      const explanation =
+        `The input evaluates to:
+
+\`\`\`ts
+${JSON.stringify(inputResult())}
+\`\`\`
+
+but the output evaluates to:
+
+\`\`\`ts
+${JSON.stringify(outputResult())}
+\`\`\``
+      url += `&explanation=${encodeURIComponent(explanation)}`
+    }
+    return url;
+  }
+
+  createEffect(() => {
+    if (outputMatch() === 'no-match') {
+      Sentry.setContext("transformation", {
+        input: input().source,
+        output: output().source,
+        inputResult: inputResult(),
+        outputResult: outputResult()
+      });
+      Sentry.captureException(new Error('OUTPUT_RESULT_MISMATCH'))
+    }
+  });
+
   return (
     <AppShell>
       <div class="flex flex-col flex-auto w-full h-full">
@@ -119,7 +157,7 @@ export const Explorer = () => {
               `focus:outline-none focus:ring-2 focus:text-sky-500 focus:ring-sky-500`,
               `hover:text-sky-500 hover:ring-2 hover:ring-sky-500`,
             )}
-            href={`https://github.com/sfishel18/moment-to-temporal/issues/new?template=bug-report.yml&title=%5BBug%5D%3A+&input=${encodeURIComponent(input().source)}&output=${encodeURIComponent(output().source)}`}
+            href={bugReportUrl()}
             target="_blank"
           >
             File an issue!
