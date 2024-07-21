@@ -32,7 +32,11 @@ const chainProcessors: Record<string, ChainProcessor> = {
         return null;
       }
       return j.template
-        .expression`${next}.toInstant().round({ smallestUnit: 'millisecond', roundingMode: 'floor' }).toString()`;
+        .expression`
+${next}.toInstant().round({ smallestUnit: 'millisecond', roundingMode: 'floor' }).toString()
+// regexery to always pad with trailing zeros
+.replace(/([.]\\d{0,3})?Z$/, (_, m) => (m || '.').padEnd(4, '0') + 'Z')
+`;
     },
   },
   format: {
