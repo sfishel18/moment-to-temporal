@@ -1,0 +1,23 @@
+name: Pull Request
+
+on:
+  pull_request:
+    branches: 
+      - main
+
+jobs:
+  run-categorizer:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v4
+    - uses: pnpm/action-setup@v4
+      with:
+        version: 8.15.1
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20.15.0
+        cache: 'pnpm'
+    - name: Install dependencies
+      run: pnpm install
+    - name: Run tests
+      run: pnpm run test
