@@ -10,6 +10,7 @@ export const transpileSource = async (source: string) => {
     return "";
   }
   const transpiled = transform({ source } as any, { j } as any, {});
+  debugger
   return await prettier.format(transpiled, {
     parser: "typescript",
     plugins: [typescriptPlugin, estreePlugin],

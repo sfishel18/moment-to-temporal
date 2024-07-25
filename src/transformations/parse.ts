@@ -4,7 +4,7 @@ import {
   ImportDeclaration,
   JSCodeshift,
 } from "jscodeshift";
-import { fromStringImport, pollyfillImport } from "./imports";
+import { pollyfillImport, toEpochNanosImport } from "./imports";
 
 export const processMomentFnCall = (
   path: ASTPath<CallExpression>,
@@ -16,6 +16,10 @@ export const processMomentFnCall = (
     imports.push(pollyfillImport(j));
     return j.template.expression`Temporal.Now.zonedDateTimeISO()`;
   }
-  imports.push(fromStringImport(j));
-  return j.template.expression`fromString(${initArgs})`;
+  if (initArgs.length <= 2) {
+    imports.push(pollyfillImport(j));
+    imports.push(toEpochNanosImport(j));
+    return j.template.expression`new Temporal.ZonedDateTime(toEpochNanos(${initArgs}), Temporal.Now.timeZoneId())`
+  }
+  return null
 };
