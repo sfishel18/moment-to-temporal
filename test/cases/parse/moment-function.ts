@@ -9,7 +9,15 @@ export const yearFormat = () => {
 };
 
 export const yearMonthDayFormat = () => {
+  return moment("2018-10-18", "YYYY-MM-DD").toDate().toISOString();
+};
+
+export const yearMonthDayFormatWithArray = () => {
   return moment("2018-10-18", ["YYYY-MM-DD"]).toDate().toISOString();
+};
+
+export const epochMilliseconds = () => {
+  return moment(1539688800000).toDate().toISOString();
 };
 
 export const isoFormat = () => {

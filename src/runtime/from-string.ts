@@ -13,13 +13,14 @@ const fromLegacyDate = (date: Date): Temporal.ZonedDateTime =>
 
 export default (
   dateString: string,
-  formats?: string[],
+  formatOrFormats?: string | string[],
 ): Temporal.ZonedDateTime => {
-  if (!formats || formats.length === 0) {
+  const formatArray: string[] | undefined = typeof formatOrFormats === 'string' ? [formatOrFormats] : formatOrFormats
+  if (!formatArray || formatArray.length === 0) {
     return fromLegacyDate(parseISO(dateString));
   }
   let date: Date = new Date(Number.NaN);
-  for (let format of formats) {
+  for (let format of formatArray) {
     date = parse(dateString, mapFormatString(format), new Date());
     if (isValidDate(date)) {
       break;

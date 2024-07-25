@@ -12,29 +12,30 @@ export const toLegacyDateImport: (j: JSCodeshift) => ImportDeclaration = once(
       .statement`import toLegacyDate from 'moment-to-temporal/runtime/to-legacy-date';`,
 );
 
-export const fromStringImport: (j: JSCodeshift) => ImportDeclaration = once(
-  (j) =>
-    j.template
-      .statement`import fromString from 'moment-to-temporal/runtime/from-string';`,
-);
-
 export const toFormattedStringImport: (j: JSCodeshift) => ImportDeclaration =
   once(
     (j) =>
       j.template
-        .statement`import toFormattedString from 'moment-to-temporal/runtime/to-formatted-string'`,
+        .statement`import toFormattedString from 'moment-to-temporal/runtime/to-formatted-string';`,
+  );
+
+export const toEpochNanosImport: (j: JSCodeshift) => ImportDeclaration =
+  once(
+    (j) =>
+      j.template
+        .statement`import toEpochNanos from 'moment-to-temporal/runtime/to-epoch-nanos';`,
   );
 
 export const allImports = [
   pollyfillImport,
   toLegacyDateImport,
-  fromStringImport,
   toFormattedStringImport,
+  toEpochNanosImport
 ];
 
 export const importDependencyMap: Map<unknown, string[]> = new Map([
   [pollyfillImport, ["@js-temporal/polyfill"]],
   [toLegacyDateImport, ["@js-temporal/polyfill", "moment-to-temporal"]],
-  [fromStringImport, ["@js-temporal/polyfill", "moment-to-temporal"]],
   [toFormattedStringImport, ["@js-temporal/polyfill", "moment-to-temporal"]],
+  [toEpochNanosImport, ["@js-temporal/polyfill", "moment-to-temporal"]],
 ]);
