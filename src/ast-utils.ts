@@ -93,10 +93,37 @@ export const findAllMomentFactoryCalls = (
   const references = specifiers.find(j.Identifier).map((path) => {
     return findAllReferences(path, j).paths();
   });
-  return references.map((path) =>
-    j.CallExpression.check(path.parentPath.node) ? path.parentPath : null,
-  );
+  return references.map((path) => {
+    const parentNode = path.parentPath.node;
+
+    // Standard call: moment(...)
+    if (j.CallExpression.check(parentNode)) {
+      return path.parentPath;
+    }
+
+    // Implicit numeric coercion: +moment(...)
+    // The unary + operator is the idiomatic way to coerce a Moment to a number
+    // via its .valueOf() method. We detect the moment() CallExpression here and
+    // let processInvocation handle the unary context via isUnaryPlusCoercion().
+    if (
+      j.UnaryExpression.check(parentNode) &&
+      parentNode.operator === "+" &&
+      j.CallExpression.check(parentNode.argument)
+    ) {
+      return path.parentPath.parentPath as ASTPath<CallExpression>;
+    }
+
+    return null;
+  });
 };
+
+/** Returns true when an ASTPath is directly wrapped in a unary + operator. */
+export const isUnaryPlusCoercion = (
+  path: ASTPath<CallExpression>,
+  j: JSCodeshift,
+): boolean =>
+  j.UnaryExpression.check(path.parentPath.node) &&
+  path.parentPath.node.operator === "+";
 
 export const annotatePath = (
   path: ASTPath<Node>,

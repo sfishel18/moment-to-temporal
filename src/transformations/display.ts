@@ -31,8 +31,7 @@ const chainProcessors: Record<string, ChainProcessor> = {
         );
         return null;
       }
-      return j.template
-        .expression`
+      return j.template.expression`
 ${next}.toInstant().round({ smallestUnit: 'millisecond', roundingMode: 'floor' }).toString()
 // regexery to always pad with trailing zeros
 .replace(/([.]\\d{0,3})?Z$/, (_, m) => (m || '.').padEnd(4, '0') + 'Z')
@@ -56,6 +55,21 @@ ${next}.toInstant().round({ smallestUnit: 'millisecond', roundingMode: 'floor' }
       return j.template.expression`toFormattedString(${next}, ${args[0]})`;
     },
   },
+  valueOf: {
+    isBreaking: true,
+    process: (path, next, _, j) => {
+      const callee = path.node.callee;
+      if (!j.MemberExpression.check(callee)) {
+        annotatePath(
+          path,
+          `failed to transform \`valueOf\`: not called as a member function`,
+          j,
+        );
+        return null;
+      }
+      return j.template.expression`${next}.epochMilliseconds`;
+    },
+  } satisfies ChainProcessor,
 };
 
 export default chainProcessors;
