@@ -2,10 +2,10 @@ import path from "path";
 import { defineConfig } from "vite";
 import solidPlugin from "vite-plugin-solid";
 import plainText from "vite-plugin-plain-text";
-import packageJson from '../package.json';
+import packageJson from "../package.json";
 
 process.env.VITE_META_DESCRIPTION = packageJson.description;
-process.env.VITE_META_KEYWORDS = packageJson.keywords.join(', ');
+process.env.VITE_META_KEYWORDS = packageJson.keywords.join(", ");
 
 export default defineConfig({
   root: __dirname,
@@ -15,12 +15,10 @@ export default defineConfig({
     process: JSON.stringify({ env: {} }),
   },
   optimizeDeps: {
-    include: ["@codemirror/state", "@codemirror/view"],
+    include: ["@codemirror/state", "@codemirror/view", "debug", "extend"],
   },
   resolve: {
     alias: {
-      // avoid console warnings from vite with `@sinonjs/fake-timers` tries to access the `timers` module
-      timers: "identity-obj-proxy",
       "moment-to-temporal/runtime/to-legacy-date": path.resolve(
         __dirname,
         "../src/runtime/to-legacy-date.ts",
