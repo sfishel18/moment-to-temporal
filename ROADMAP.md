@@ -37,11 +37,11 @@ The codemod today handles the following Moment.js methods:
 **Priority:** P0 — most frequently used after what is already covered  
 **Theme:** Methods that produce a primitive value from a Moment chain. All are `isBreaking: true` and belong in `src/transformations/display.ts`.
 
-- [ ] **`.valueOf()`** → `.epochMilliseconds`
+- [x] **`.valueOf()`** → `.epochMilliseconds`
   - Effort: S
   - `isBreaking: true` — returns a number
   - Moment's `.valueOf()` returns epoch milliseconds; `ZonedDateTime.epochMilliseconds` is a direct equivalent
-  - Also handles implicit numeric coercion (`+moment()`)
+  - Also handles implicit numeric coercion (`+moment()`) — detected via `UnaryExpression('+')` parent in `findAllMomentFactoryCalls`
 
 - [ ] **`.unix()`** → `Math.floor(zdt.epochMilliseconds / 1000)`
   - Effort: S
