@@ -19,11 +19,21 @@ import {
   isUnaryPlusCoercion,
   removeUnusedReferences,
 } from "./ast-utils";
-import { ChainProcessor, ExpressionObject } from "./types";
-import displayChainProcessors from "./transformations/display";
-import manipulateChainProcessors from "./transformations/manipulate";
+import { ExpressionObject, ImportFactory } from "./types";
 import { processMomentFnCall } from "./transformations/parse";
-import { importDependencyMap, allImports } from "./transformations/imports";
+import { loadAllProcessors } from "./transformations/load-processors";
+import {
+  getProcessor,
+  resolveImports,
+  getAllImportFactories,
+  getDependencyMap,
+} from "./transformations/registry";
+import {
+  pollyfillImport,
+  toEpochNanosImport,
+} from "./transformations/import-factories";
+
+loadAllProcessors();
 
 const addImports = (
   source: Collection<unknown>,
@@ -32,11 +42,6 @@ const addImports = (
 ) => {
   const file = source.isOfType(j.File) ? (source as Collection<File>) : null;
   file?.nodes()[0]?.program.body.unshift(...uniq(imports));
-};
-
-const chainProcessors: Partial<Record<string, ChainProcessor>> = {
-  ...displayChainProcessors,
-  ...manipulateChainProcessors,
 };
 
 type CallChain = {
@@ -73,67 +78,92 @@ const getChainCallName = (
   return null;
 };
 
+/**
+ * Walk a list of chained call steps, dispatching each to its registered
+ * processor. Accumulates import factories for all successfully invoked
+ * processors. Returns the final expression and collected factories, or null
+ * if the chain could not be fully processed.
+ */
 const processChainSteps = (
   steps: ASTPath<CallExpression>[],
   initialExpr: ExpressionObject,
-  imports: ImportDeclaration[],
   j: JSCodeshift,
   opts?: { annotateUnsupported?: boolean },
-): ExpressionObject | null => {
-  let expr: ExpressionObject | null = initialExpr;
+): { expression: ExpressionObject; importFactories: ImportFactory[] } | null => {
+  let expr: ExpressionObject = initialExpr;
+  const importFactories: ImportFactory[] = [];
+
   for (const step of steps) {
     const name = getChainCallName(step.node, j);
-    if (name && expr && chainProcessors[name]) {
-      expr = chainProcessors[name]?.process(step, expr, imports, j) || null;
-    } else {
-      if (opts?.annotateUnsupported && name && !chainProcessors[name]) {
+    const processor = name ? getProcessor(name) : undefined;
+
+    if (!processor) {
+      if (opts?.annotateUnsupported && name) {
         annotatePath(step, `the "${name}" method is not yet supported`, j);
       }
-      expr = null;
-      break;
+      return null;
     }
+
+    // Centralized MemberExpression guard — all chained calls must be member
+    // expressions. Individual processors no longer need to check this.
+    if (!j.MemberExpression.check(step.node.callee)) {
+      annotatePath(
+        step,
+        `failed to transform \`${name}\`: not called as a member function`,
+        j,
+      );
+      return null;
+    }
+
+    const result = processor.process(step, expr, j);
+    if (!result.ok) {
+      annotatePath(step, result.reason, j);
+      return null;
+    }
+
+    expr = result.expression;
+    importFactories.push(...(processor.imports ?? []));
   }
-  return expr;
+
+  return { expression: expr, importFactories };
 };
 
 const processInvocation = (
   path: ASTPath<CallExpression>,
-  imports: ImportDeclaration[],
   j: JSCodeshift,
-): boolean => {
+): ImportFactory[] | null => {
   const chain = invocationToChain(path, j);
-  const initReplacement = processMomentFnCall(chain.init, imports, j);
-  if (!initReplacement) {
-    return false;
+  const parseResult = processMomentFnCall(chain.init, j);
+  if (!parseResult) {
+    return null;
   }
+
+  const collectedFactories: ImportFactory[] = [...parseResult.imports];
+
   // +moment(...) or +moment().add(...) etc. — unary plus is implicit .valueOf().
   // The + operator wraps the outermost call in the chain, so check there rather
   // than on the moment() init call itself.
-  const chainBreaker = chain.chains.find((path) => {
-    const name = getChainCallName(path.node, j);
-    return name && chainProcessors[name]?.isBreaking;
+  const chainBreaker = chain.chains.find((p) => {
+    const name = getChainCallName(p.node, j);
+    return name && getProcessor(name)?.isBreaking;
   });
   const outermostPath = last(chain.chains) ?? path;
+
   if (isUnaryPlusCoercion(outermostPath, j)) {
-    // If a chain breaker exists (e.g., valueOf), only process steps up to and
-    // including it. Steps after the breaker stay as-is since they operate on
-    // the primitive value returned by the breaker.
     const stepsToProcess = chainBreaker
       ? chain.chains.slice(0, chain.chains.indexOf(chainBreaker) + 1)
       : chain.chains;
-    const builtExpr = processChainSteps(
+    const chainResult = processChainSteps(
       stepsToProcess,
-      initReplacement,
-      imports,
+      parseResult.expression,
       j,
     );
-    if (builtExpr !== null) {
+    if (chainResult !== null) {
+      collectedFactories.push(...chainResult.importFactories);
       if (chainBreaker) {
-        // Reconstruct the suffix chain: .toString().slice(0, 3) from
-        // +moment().valueOf().toString().slice(0, 3)
         const breakerIdx = chain.chains.indexOf(chainBreaker);
         const afterBreaker = chain.chains.slice(breakerIdx + 1);
-        let expr = builtExpr;
+        let expr = chainResult.expression;
         for (const step of afterBreaker) {
           const callee = step.node.callee;
           if (j.MemberExpression.check(callee)) {
@@ -143,18 +173,16 @@ const processInvocation = (
             );
           }
         }
-        // Preserve the unary + operator since we're now working with a primitive
         const unary = outermostPath.parentPath.node;
         const replacement = j.unaryExpression(unary.operator, expr);
         outermostPath.parentPath.replace(replacement);
       } else {
-        // No chain breaker found, so +moment() becomes .epochMilliseconds
-        const epochMs = j.template.expression`${builtExpr}.epochMilliseconds`;
+        const epochMs = j.template.expression`${chainResult.expression}.epochMilliseconds`;
         outermostPath.parentPath.replace(epochMs);
       }
-      return true;
+      return collectedFactories;
     }
-    return false;
+    return null;
   }
 
   if (!chainBreaker) {
@@ -163,24 +191,25 @@ const processInvocation = (
       "only expressions that evaluate to a primitive or Date can be transformed",
       j,
     );
-    return false;
+    return null;
   }
+
   const subChain = chain.chains.slice(
     0,
     chain.chains.indexOf(chainBreaker) + 1,
   );
-  const outermostCall = processChainSteps(
+  const chainResult = processChainSteps(
     subChain,
-    initReplacement,
-    imports,
+    parseResult.expression,
     j,
     { annotateUnsupported: true },
   );
-  if (outermostCall !== null) {
-    last(subChain)?.replace(outermostCall);
-    return true;
+  if (chainResult !== null) {
+    collectedFactories.push(...chainResult.importFactories);
+    last(subChain)?.replace(chainResult.expression);
+    return collectedFactories;
   }
-  return false;
+  return null;
 };
 
 export default function transform(
@@ -190,15 +219,17 @@ export default function transform(
 ) {
   const source = j(file.source);
   const invocations = findAllMomentFactoryCalls(source, j);
-  const imports: ImportDeclaration[] = [];
+  const usedFactories: ImportFactory[] = [];
+
   invocations?.forEach((path) => {
-    const pendingImports: ImportDeclaration[] = [];
-    const wasProcessed = processInvocation(path, pendingImports, j);
-    if (wasProcessed) {
-      imports.push(...pendingImports);
+    const factories = processInvocation(path, j);
+    if (factories !== null) {
+      usedFactories.push(...factories);
     }
   });
-  addImports(source, imports, j);
+
+  addImports(source, resolveImports(usedFactories, j), j);
+
   findAllMomentDefaultSpecifiers(source, j)
     .find(j.Identifier)
     .forEach((path) => {
@@ -212,21 +243,38 @@ export default function transform(
     });
 
   if (options["resultFilePath"]) {
+    // Build the dependency map from registered processors plus the parse-phase
+    // factories (polyfill and toEpochNanos), which are not processor-owned.
+    const dependencyMap = getDependencyMap([
+      {
+        factory: pollyfillImport,
+        npmDeps: ["@js-temporal/polyfill"],
+      },
+      {
+        factory: toEpochNanosImport,
+        npmDeps: ["@js-temporal/polyfill", "moment-to-temporal"],
+      },
+    ]);
+    const allFactories = getAllImportFactories().concat([pollyfillImport, toEpochNanosImport]);
+    const resolvedImports = resolveImports(usedFactories, j);
+
     fs.writeFileSync(
       options["resultFilePath"],
       JSON.stringify({
         importsAdded: uniq(
-          imports.flatMap((i) => {
-            const matchingFactory = allImports.find((f) => f(j) === i);
-            return importDependencyMap.get(matchingFactory) || [];
+          resolvedImports.flatMap((importDecl) => {
+            const matchingFactory = allFactories.find(
+              (f) => f(j) === importDecl,
+            );
+            if (!matchingFactory) return [];
+            return dependencyMap.get(matchingFactory) ?? [];
           }),
         ),
       }),
-      {
-        encoding: "utf-8",
-      },
+      { encoding: "utf-8" },
     );
     options["importsAdded"]?.("aha");
   }
+
   return source.toSource(options["printOptions"]);
 }

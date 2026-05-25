@@ -1,25 +1,29 @@
-import {
-  ASTPath,
-  CallExpression,
-  ImportDeclaration,
-  JSCodeshift,
-} from "jscodeshift";
-import { pollyfillImport, toEpochNanosImport } from "./imports";
+import { ASTPath, CallExpression, JSCodeshift } from "jscodeshift";
+import { ImportFactory } from "../types";
+import { pollyfillImport, toEpochNanosImport } from "./import-factories";
+
+export type ParseResult = {
+  expression: CallExpression;
+  imports: ImportFactory[];
+} | null;
 
 export const processMomentFnCall = (
   path: ASTPath<CallExpression>,
-  imports: ImportDeclaration[],
   j: JSCodeshift,
-): CallExpression | null => {
+): ParseResult => {
   const { arguments: initArgs } = path.node;
   if (initArgs.length === 0) {
-    imports.push(pollyfillImport(j));
-    return j.template.expression`Temporal.Now.zonedDateTimeISO()`;
+    return {
+      expression: j.template.expression`Temporal.Now.zonedDateTimeISO()`,
+      imports: [pollyfillImport],
+    };
   }
   if (initArgs.length <= 2) {
-    imports.push(pollyfillImport(j));
-    imports.push(toEpochNanosImport(j));
-    return j.template.expression`new Temporal.ZonedDateTime(toEpochNanos(${initArgs}), Temporal.Now.timeZoneId())`
+    return {
+      expression: j.template
+        .expression`new Temporal.ZonedDateTime(toEpochNanos(${initArgs}), Temporal.Now.timeZoneId())`,
+      imports: [pollyfillImport, toEpochNanosImport],
+    };
   }
-  return null
+  return null;
 };
