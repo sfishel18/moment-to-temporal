@@ -24,7 +24,6 @@ export const unitConversionMap: Partial<Record<string, string>> = {
   hour: "hours",
   d: "days",
   day: "days",
-  date: "days",
   w: "weeks",
   week: "weeks",
   M: "months",
@@ -33,25 +32,34 @@ export const unitConversionMap: Partial<Record<string, string>> = {
   year: "years",
 };
 
+// Moment accepts "date" (day-of-month) for startOf/endOf but silently
+// ignores it as an add/subtract unit, so it is only valid when converting
+// rounding units — not durations.
+export const roundingUnitConversionMap: Partial<Record<string, string>> = {
+  ...unitConversionMap,
+  date: "days",
+};
+
 export const notRoundableUnits = ["weeks", "months", "years"];
 
 export const convertUnitArg = (
   unitArg: Literal | StringLiteral | Identifier,
   j: JSCodeshift,
+  conversionMap: Partial<Record<string, string>> = unitConversionMap,
 ): TypedResult<StringLiteral> => {
   const value = j.Identifier.check(unitArg) ? unitArg.name : unitArg.value;
   if (typeof value !== "string") {
     return { ok: false, reason: "unit is not a string" };
   }
   if (
-    !Object.keys(unitConversionMap).includes(value) &&
-    !Object.values(unitConversionMap).includes(value)
+    !Object.keys(conversionMap).includes(value) &&
+    !Object.values(conversionMap).includes(value)
   ) {
     return { ok: false, reason: `unit "${value}" is not recognized` };
   }
   return {
     ok: true,
-    expression: j.stringLiteral(unitConversionMap[value] ?? value),
+    expression: j.stringLiteral(conversionMap[value] ?? value),
   };
 };
 

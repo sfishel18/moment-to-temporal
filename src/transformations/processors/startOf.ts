@@ -1,5 +1,9 @@
 import { register } from "../registry";
-import { convertUnitArg, notRoundableUnits } from "../shared/unit-conversion";
+import {
+  convertUnitArg,
+  notRoundableUnits,
+  roundingUnitConversionMap,
+} from "../shared/unit-conversion";
 
 register({
   name: "startOf",
@@ -11,7 +15,7 @@ register({
     if (!j.StringLiteral.check(unitArg) && !j.Literal.check(unitArg)) {
       return { ok: false, reason: "failed to transform `startOf`: unit is not a string literal" };
     }
-    const convertedUnit = convertUnitArg(unitArg, j);
+    const convertedUnit = convertUnitArg(unitArg, j, roundingUnitConversionMap);
     if (!convertedUnit.ok) {
       return { ok: false, reason: `failed to transform \`startOf\`: ${convertedUnit.reason}` };
     }

@@ -38,6 +38,16 @@ export const bareNumberArgument = (): string => {
   return moment().add(5).toDate().toISOString();
 };
 
+export const dateIsNotADurationUnit = (): string => {
+  // moment silently ignores "date" as an add/subtract unit (it is only
+  // valid for startOf/endOf), so the chain must be left untouched.
+  return moment().add(3, "date").toDate().toISOString();
+};
+
+export const dateIsNotADurationObjectKey = (): string => {
+  return moment().add({ date: 3 }).toDate().toISOString();
+};
+
 export const templateLiteralObjectKey = (): string => {
   // A computed template-literal key is not a string literal, plain literal,
   // or identifier — it must be rejected.
@@ -96,6 +106,7 @@ export const expectedAnnotations = [
   "failed to transform `add`: expected an object literal",
   "failed to transform `add`: spread properties are not supported",
   'failed to transform `add`: unit "computedKey" is not recognized',
+  'failed to transform `add`: unit "date" is not recognized',
   'failed to transform `add`: unit "fortnights" is not recognized',
   "failed to transform `add`: all object keys are not string literals",
   "failed to transform `subtract`: expected an object literal",
