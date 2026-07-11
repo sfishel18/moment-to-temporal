@@ -55,16 +55,21 @@ documented here:
   runtime mutants and they all falsely survive.
 - **The explicit `plugins` entry is required.** Stryker's default `@stryker-mutator/*`
   wildcard plugin discovery fails under pnpm's node_modules layout.
-- **The test file compensates for Stryker's shared sandbox.** Stryker workers run
-  concurrently in one sandbox with vitest isolation disabled, so `test/all-cases.test.ts`
-  (a) suffixes generated `.mod` filenames with `process.pid` to avoid cross-worker races, and
-  (b) cache-busts the dynamic import of the `.mod` file (`?v=<random>`) so each mutant run
-  sees freshly transformed output instead of a module cached from a previous run.
-- **The transform must be invoked in-process** (as the test does via jscodeshift's API), not
-  through a subprocess like the hypermod CLI: the vitest runner activates mutants in-memory,
-  so mutated code running in a child process never activates and falsely survives. Relatedly,
-  the transform runs in `beforeAll` (not at module load) so Stryker attributes those mutants
-  to specific tests instead of classifying them as static.
+- **Every test in `test/all-cases.test.ts` runs the transform itself, inside the test
+  body.** Do not "optimize" this into a shared `beforeAll` or a memoized helper. Stryker's
+  per-test coverage only credits tests that _execute_ mutated code; with a shared transform
+  step, the tests that assert on its output (e.g. "moment import removed") fall out of every
+  mutant's covering set, Stryker's filtered mutant runs skip them, and mutants falsely
+  survive. (The vitest runner always plans per-test — setting `coverageAnalysis: "all"` does
+  not change this.)
+- **Generated `.mod` file paths are unique per invocation** (`pid` + random token):
+  the pid prevents concurrent Stryker workers (which share one sandbox) racing on the same
+  files, and the random token defeats the module cache that Stryker's isolation-free reruns
+  would otherwise serve stale modules from. A `?v=` query suffix is NOT sufficient — it gets
+  normalized away.
+- **The transform must be invoked in-process** (via jscodeshift's API), not through a
+  subprocess like the hypermod CLI: the vitest runner activates mutants in-memory, so
+  mutated code running in a child process never activates and falsely survives.
 - Mutation results are cached incrementally in `reports/stryker-incremental.json`
   (gitignored). Delete it if results look stale — config changes do not invalidate it.
 

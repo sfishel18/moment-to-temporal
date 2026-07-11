@@ -19,3 +19,5 @@ export const endOfQuarter = (): string => {
 export const endOfYear = (): string => {
   return moment().endOf("year").toDate().toISOString();
 };
+
+export const expectNoMoment = false;

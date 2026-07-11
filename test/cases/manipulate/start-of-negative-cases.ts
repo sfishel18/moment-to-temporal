@@ -19,3 +19,5 @@ export const startOfQuarter = (): string => {
 export const startOfYear = (): string => {
   return moment().startOf("year").toDate().toISOString();
 };
+
+export const expectNoMoment = false;
