@@ -21,7 +21,7 @@ import {
 } from "./ast-utils";
 import { ExpressionObject, ImportFactory } from "./types";
 import { processMomentFnCall } from "./transformations/parse";
-import { loadAllProcessors } from "./transformations/load-processors";
+import "./transformations/load-processors";
 import {
   getProcessor,
   resolveImports,
@@ -32,8 +32,6 @@ import {
   pollyfillImport,
   toEpochNanosImport,
 } from "./transformations/import-factories";
-
-loadAllProcessors();
 
 const addImports = (
   source: Collection<unknown>,

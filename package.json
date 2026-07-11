@@ -23,6 +23,7 @@
   ],
   "scripts": {
     "test": "vitest --run",
+    "test:mutation": "stryker run",
     "build": "tsc -p ./tsconfig.build.json",
     "docs": "vite --config docs/vite.config.ts",
     "docs:build": "vite --config docs/vite.config.ts build"
@@ -41,6 +42,8 @@
     "@solid-codemirror/codemirror": "^1.0.4",
     "@solid-primitives/scheduled": "^1.5.3",
     "@solidjs/router": "^0.13.6",
+    "@stryker-mutator/core": "^9.6.1",
+    "@stryker-mutator/vitest-runner": "^9.6.1",
     "@tsconfig/strictest": "^2.0.8",
     "@tsconfig/vite-react": "^3.4.0",
     "@types/lodash": "^4.17.24",
@@ -66,7 +69,7 @@
     "vite-plugin-node-polyfills": "^0.26.0",
     "vite-plugin-plain-text": "^1.4.2",
     "vite-plugin-solid": "^2.11.12",
-    "vitest": "^1.6.1"
+    "vitest": "^3.2.7"
   },
   "dependencies": {
     "@sentry/browser": "^8.55.1",

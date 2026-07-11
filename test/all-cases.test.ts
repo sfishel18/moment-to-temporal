@@ -1,9 +1,18 @@
 import { globSync } from "glob";
 import { join, relative } from "path";
-import { beforeEach, describe, expect, test, vi } from "vitest";
-import { copyFileSync, readFileSync } from "fs";
-import { execSync } from "child_process";
+import { beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
+import { readFileSync, writeFileSync } from "fs";
 import { isFunction } from "lodash";
+import jscodeshift, { API } from "jscodeshift";
+import transform from "../src/transform";
+
+const j = jscodeshift.withParser("ts");
+const api: API = {
+  j,
+  jscodeshift: j,
+  stats: () => {},
+  report: () => {},
+};
 
 describe("all cases", () => {
   beforeEach(() => {
@@ -19,28 +28,34 @@ describe("all cases", () => {
   const files = onlyFiles.length > 0 ? onlyFiles : allFiles;
   for (let file of files) {
     describe(relative(`${__dirname}/cases`, file), async () => {
+      // Include the pid so concurrent test processes (e.g. Stryker workers
+      // sharing a sandbox) don't race on the same output files.
       const modFile = file
-        .replace(/.js$/, ".mod.js")
-        .replace(/.ts$/, ".mod.ts");
-      copyFileSync(file, modFile);
-      execSync(
-        `${join(__dirname, "../node_modules/.bin/hypermod")} -p ts -t ${join(
-          __dirname,
-          "../src/transform.ts",
-        )} ${modFile}`,
-      );
+        .replace(/.js$/, `.pid${process.pid}.mod.js`)
+        .replace(/.ts$/, `.pid${process.pid}.mod.ts`);
       const expected = await import(file);
-      const actual = await import(modFile);
+      let actual: Record<string, unknown>;
+      beforeAll(async () => {
+        const source = readFileSync(file, { encoding: "utf-8" });
+        writeFileSync(modFile, transform({ source, path: modFile }, api, {}));
+        // Cache-bust the import: Stryker's vitest runner disables test
+        // isolation, so without this a rerun would get the module cached from
+        // a previous mutant run instead of the freshly written output.
+        // (Math.random rather than Date.now because fake timers freeze Date.)
+        actual = await import(`${modFile}?v=${Math.random().toString(36).slice(2)}`);
+      });
       Object.keys(expected).forEach((key) => {
         if (isFunction(expected[key])) {
           test(key, () => {
-            expect(expected[key]()).toEqual(actual[key]());
+            expect(expected[key]()).toEqual(
+              (actual[key] as () => unknown)(),
+            );
           });
         }
       });
       if (expected.expectNoMoment) {
-        const actualSource = readFileSync(modFile, { encoding: "utf-8" });
         test("moment import removed", () => {
+          const actualSource = readFileSync(modFile, { encoding: "utf-8" });
           expect(actualSource).not.toMatch(/import .* from "moment";/);
         });
       }

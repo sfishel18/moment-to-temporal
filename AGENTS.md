@@ -8,6 +8,7 @@ A JSCodeshift codemod that transforms Moment.js code into TC39 Temporal API code
 | ----------------- | ---------------- |
 | Install           | `pnpm install`   |
 | Test              | `pnpm test`      |
+| Mutation testing  | `pnpm test:mutation` |
 | Build (to `lib/`) | `pnpm run build` |
 | Docs dev server   | `pnpm run docs`  |
 
@@ -40,6 +41,32 @@ lib/                    # Compiled output (gitignored)
 ## Architecture (Brief)
 
 The codemod finds all `moment()` calls, builds a method chain for each, and processes the chain through a pipeline of `ChainProcessor` objects (defined in `src/types.ts`). Each processor handles one Moment.js method (e.g., `add`, `toDate`). Processors with `isBreaking: true` produce a non-Moment value -- at least one must be present in the chain for transformation to succeed. Unsupported methods get an annotation comment in the output.
+
+## Mutation Testing (Stryker)
+
+`pnpm test:mutation` runs [StrykerJS](https://stryker-mutator.io/) with the vitest runner
+(config: `stryker.config.json`, HTML report: `reports/mutation/mutation.html`). Several
+settings are load-bearing and non-obvious — JSON config can't hold comments, so they are
+documented here:
+
+- **`vitest.related: false` must stay false.** The test suite generates `.mod.ts` files at
+  runtime and imports them dynamically, so vitest's static module graph cannot connect test
+  files to `src/runtime/**`. With `related` enabled, vitest silently runs _zero_ tests for
+  runtime mutants and they all falsely survive.
+- **The explicit `plugins` entry is required.** Stryker's default `@stryker-mutator/*`
+  wildcard plugin discovery fails under pnpm's node_modules layout.
+- **The test file compensates for Stryker's shared sandbox.** Stryker workers run
+  concurrently in one sandbox with vitest isolation disabled, so `test/all-cases.test.ts`
+  (a) suffixes generated `.mod` filenames with `process.pid` to avoid cross-worker races, and
+  (b) cache-busts the dynamic import of the `.mod` file (`?v=<random>`) so each mutant run
+  sees freshly transformed output instead of a module cached from a previous run.
+- **The transform must be invoked in-process** (as the test does via jscodeshift's API), not
+  through a subprocess like the hypermod CLI: the vitest runner activates mutants in-memory,
+  so mutated code running in a child process never activates and falsely survives. Relatedly,
+  the transform runs in `beforeAll` (not at module load) so Stryker attributes those mutants
+  to specific tests instead of classifying them as static.
+- Mutation results are cached incrementally in `reports/stryker-incremental.json`
+  (gitignored). Delete it if results look stale — config changes do not invalidate it.
 
 ## Skills
 
