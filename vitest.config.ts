@@ -2,6 +2,9 @@ import path from "path";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
+  test: {
+    exclude: ["**/node_modules/**", "**/.stryker-tmp/**"],
+  },
   resolve: {
     alias: {
       "moment-to-temporal/runtime/to-legacy-date": path.resolve(

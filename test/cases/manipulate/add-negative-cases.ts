@@ -5,3 +5,7 @@ export const quartersAsUnits = (): string => {
 };
 
 export const expectNoMoment = false;
+
+export const expectedAnnotations = [
+  'failed to transform `add`: unit "quarter" is not recognized',
+];

@@ -19,3 +19,13 @@ export const endOfQuarter = (): string => {
 export const endOfYear = (): string => {
   return moment().endOf("year").toDate().toISOString();
 };
+
+export const expectNoMoment = false;
+
+export const expectedAnnotations = [
+  'failed to transform `endOf`: unit "weeks" does not support rounding',
+  'failed to transform `endOf`: unit "isoWeek" is not recognized',
+  'failed to transform `endOf`: unit "months" does not support rounding',
+  'failed to transform `endOf`: unit "quarter" is not recognized',
+  'failed to transform `endOf`: unit "years" does not support rounding',
+];

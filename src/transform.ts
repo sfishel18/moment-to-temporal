@@ -21,7 +21,7 @@ import {
 } from "./ast-utils";
 import { ExpressionObject, ImportFactory } from "./types";
 import { processMomentFnCall } from "./transformations/parse";
-import { loadAllProcessors } from "./transformations/load-processors";
+import "./transformations/load-processors";
 import {
   getProcessor,
   resolveImports,
@@ -33,14 +33,15 @@ import {
   toEpochNanosImport,
 } from "./transformations/import-factories";
 
-loadAllProcessors();
-
 const addImports = (
   source: Collection<unknown>,
   imports: ImportDeclaration[],
   j: JSCodeshift,
 ) => {
   const file = source.isOfType(j.File) ? (source as Collection<File>) : null;
+  // Defensive only — the collection always wraps a parsed File, so neither
+  // optional link is observable.
+  // Stryker disable next-line OptionalChaining: unreachable defensive optional chaining
   file?.nodes()[0]?.program.body.unshift(...uniq(imports));
 };
 
@@ -71,6 +72,9 @@ const getChainCallName = (
 ): string | null => {
   if (
     j.MemberExpression.check(node.callee) &&
+    // A computed callee (`m[method]()`) has no statically-known name — the
+    // property identifier is a variable, not the method being called.
+    !node.callee.computed &&
     j.Identifier.check(node.callee.property)
   ) {
     return node.callee.property.name;
@@ -106,6 +110,11 @@ const processChainSteps = (
 
     // Centralized MemberExpression guard — all chained calls must be member
     // expressions. Individual processors no longer need to check this.
+    // Unreachable by construction: reaching this line requires a resolved
+    // processor, which requires getChainCallName() to have returned a name,
+    // which requires the callee to be a MemberExpression. Kept as a safety
+    // net for future dispatch changes.
+    // Stryker disable next-line all: unreachable safety-net guard
     if (!j.MemberExpression.check(step.node.callee)) {
       annotatePath(
         step,
@@ -273,7 +282,6 @@ export default function transform(
       }),
       { encoding: "utf-8" },
     );
-    options["importsAdded"]?.("aha");
   }
 
   return source.toSource(options["printOptions"]);

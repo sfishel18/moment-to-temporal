@@ -5,3 +5,5 @@ test/**/*.mod.ts
 docs/dist
 lib
 bin/result.json
+.stryker-tmp
+reports/

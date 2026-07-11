@@ -44,6 +44,9 @@ const findAllReferences = (
   const references: ASTPath<Identifier>[] = [];
   while (idsToProcess.length > 0) {
     const id = idsToProcess.shift();
+    // Unreachable: the loop condition guarantees shift() returns an item;
+    // this check only narrows the TypeScript type.
+    // Stryker disable next-line all: unreachable type-narrowing guard
     if (!id) {
       continue;
     }
@@ -96,21 +99,11 @@ export const findAllMomentFactoryCalls = (
   return references.map((path) => {
     const parentNode = path.parentPath.node;
 
-    // Standard call: moment(...)
+    // Standard call: moment(...). This also covers +moment(...) coercions —
+    // the identifier's parent is the CallExpression either way, and
+    // processInvocation handles the unary context via isUnaryPlusCoercion().
     if (j.CallExpression.check(parentNode)) {
       return path.parentPath;
-    }
-
-    // Implicit numeric coercion: +moment(...)
-    // The unary + operator is the idiomatic way to coerce a Moment to a number
-    // via its .valueOf() method. We detect the moment() CallExpression here and
-    // let processInvocation handle the unary context via isUnaryPlusCoercion().
-    if (
-      j.UnaryExpression.check(parentNode) &&
-      parentNode.operator === "+" &&
-      j.CallExpression.check(parentNode.argument)
-    ) {
-      return path.parentPath.parentPath as ASTPath<CallExpression>;
     }
 
     return null;
