@@ -8,6 +8,11 @@
   },
   "mutate": ["src/**/*.ts"],
   "coverageAnalysis": "perTest",
+  "thresholds": {
+    "high": 95,
+    "low": 90,
+    "break": 95
+  },
   "incremental": true,
   "reporters": ["html", "clear-text", "progress"]
 }

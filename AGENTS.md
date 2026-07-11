@@ -45,9 +45,11 @@ The codemod finds all `moment()` calls, builds a method chain for each, and proc
 ## Mutation Testing (Stryker)
 
 `pnpm test:mutation` runs [StrykerJS](https://stryker-mutator.io/) with the vitest runner
-(config: `stryker.config.json`, HTML report: `reports/mutation/mutation.html`). Several
-settings are load-bearing and non-obvious — JSON config can't hold comments, so they are
-documented here:
+(config: `stryker.config.json`, HTML report: `reports/mutation/mutation.html`). CI runs it
+on every pull request and fails below a 95% mutation score (`thresholds.break`); the
+remaining ~3% are classified equivalent/unkillable mutants, so a real regression in test
+strength is what pushes the score under the bar. Several settings are load-bearing and
+non-obvious — JSON config can't hold comments, so they are documented here:
 
 - **`vitest.related: false` must stay false.** The test suite generates `.mod.ts` files at
   runtime and imports them dynamically, so vitest's static module graph cannot connect test
