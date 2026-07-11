@@ -73,9 +73,37 @@ export const endOfSpread = (): string => {
   return moment().endOf(...args).toDate().toISOString();
 };
 
+export const endOfIdentifierUnit = (): string => {
+  const unit = "day" as const;
+  return moment().endOf(unit).toDate().toISOString();
+};
+
+export const spreadAmountWithLiteralUnit = (): string => {
+  const amount: [number] = [1];
+  return moment().add(...amount, "days").toDate().toISOString();
+};
+
 export const endOfNumericUnit = (): string => {
   // @ts-expect-error deliberately invalid unit argument
   return moment().endOf(42).toDate().toISOString();
 };
 
 export const expectNoMoment = false;
+
+export const expectedAnnotations = [
+  "failed to transform `add`: unit is not a string literal",
+  "failed to transform `add`: unit is not a string",
+  "failed to transform `add`: expected an object literal",
+  "failed to transform `add`: spread properties are not supported",
+  'failed to transform `add`: unit "computedKey" is not recognized',
+  'failed to transform `add`: unit "fortnights" is not recognized',
+  "failed to transform `add`: all object keys are not string literals",
+  "failed to transform `subtract`: expected an object literal",
+  "failed to transform `startOf`: spread operator not supported",
+  "failed to transform `startOf`: unit is not a string literal",
+  "failed to transform `startOf`: unit is not a string",
+  "failed to transform `endOf`: spread operator not supported",
+  "failed to transform `endOf`: unit is not a string",
+  "failed to transform `endOf`: unit is not a string literal",
+  "failed to transform `add`: spread operator is not supported",
+];

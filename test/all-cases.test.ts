@@ -86,6 +86,28 @@ describe("all cases", () => {
           });
         });
       }
+      if (Array.isArray(expected.expectedAnnotations)) {
+        // Cases can pin the diagnostic annotations the transform must leave
+        // on code it refuses to change. Only the annotation *comments* are
+        // compared — not the whole output — so unrelated formatting or
+        // codegen changes stay quiet while lost or wrong diagnostics fail
+        // loudly. (Extracting the comments also matters for correctness: the
+        // expectedAnnotations array literal is itself part of the transformed
+        // source, so a plain substring check would match it and always pass.)
+        test("expected annotations present", async () => {
+          await withTransformed(async ({ output }) => {
+            const annotations = [
+              ...output.matchAll(/\[from moment-to-temporal\] (.*?)\. \*\//g),
+            ].map((m) => m[1]);
+            // Exact set equality: a missing, garbled, or *extra* diagnostic
+            // all fail. Duplicates are fine (the same failure can annotate
+            // several call sites).
+            expect(new Set(annotations)).toEqual(
+              new Set(expected.expectedAnnotations as string[]),
+            );
+          });
+        });
+      }
     });
   }
 });

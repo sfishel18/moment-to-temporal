@@ -54,6 +54,17 @@ export const f = () => moment("2018-10-18").valueOf();`,
     ]);
   });
 
+  test("format chain reports the toFormattedString runtime dep", () => {
+    const { importsAdded } = runTransform(
+      `import moment from "moment";
+export const f = () => moment().format("YYYY");`,
+    );
+    expect(importsAdded.sort()).toEqual([
+      "@js-temporal/polyfill",
+      "moment-to-temporal",
+    ]);
+  });
+
   test("chain without runtime helpers reports only the polyfill", () => {
     const { importsAdded } = runTransform(
       `import moment from "moment";

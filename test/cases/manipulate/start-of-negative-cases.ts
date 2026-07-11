@@ -21,3 +21,11 @@ export const startOfYear = (): string => {
 };
 
 export const expectNoMoment = false;
+
+export const expectedAnnotations = [
+  'failed to transform `startOf`: unit "weeks" does not support rounding',
+  'failed to transform `startOf`: unit "isoWeek" is not recognized',
+  'failed to transform `startOf`: unit "months" does not support rounding',
+  'failed to transform `startOf`: unit "quarter" is not recognized',
+  'failed to transform `startOf`: unit "years" does not support rounding',
+];

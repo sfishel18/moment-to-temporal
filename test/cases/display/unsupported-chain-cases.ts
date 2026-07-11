@@ -40,3 +40,8 @@ export const methodReferenceIsNotAChain = (): string => {
 };
 
 export const expectNoMoment = false;
+
+export const expectedAnnotations = [
+  'the "clone" method is not yet supported',
+  "only expressions that evaluate to a primitive or Date can be transformed",
+];
