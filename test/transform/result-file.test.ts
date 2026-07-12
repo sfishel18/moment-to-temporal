@@ -65,6 +65,28 @@ export const f = () => moment().format("YYYY");`,
     ]);
   });
 
+  test("toString chain reports the toMomentString runtime dep", () => {
+    const { importsAdded } = runTransform(
+      `import moment from "moment";
+export const f = () => moment().toString();`,
+    );
+    expect(importsAdded.sort()).toEqual([
+      "@js-temporal/polyfill",
+      "moment-to-temporal",
+    ]);
+  });
+
+  test("diff chain reports the diffZonedDateTime runtime dep", () => {
+    const { importsAdded } = runTransform(
+      `import moment from "moment";
+export const f = () => moment().diff(new Date(), "days");`,
+    );
+    expect(importsAdded.sort()).toEqual([
+      "@js-temporal/polyfill",
+      "moment-to-temporal",
+    ]);
+  });
+
   test("chain without runtime helpers reports only the polyfill", () => {
     const { importsAdded } = runTransform(
       `import moment from "moment";

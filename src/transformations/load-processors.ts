@@ -9,10 +9,15 @@
  * import here.
  */
 import "./processors/add";
+import "./processors/clone";
+import "./processors/diff";
 import "./processors/endOf";
 import "./processors/format";
 import "./processors/startOf";
 import "./processors/subtract";
 import "./processors/toDate";
 import "./processors/toISOString";
+import "./processors/toJSON";
+import "./processors/toString";
+import "./processors/unix";
 import "./processors/valueOf";

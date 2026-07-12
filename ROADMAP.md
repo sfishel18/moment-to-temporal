@@ -22,6 +22,12 @@ The codemod today handles the following Moment.js methods:
 | Display    | `.toDate()`                                 | `toLegacyDate(zdt)` (runtime helper)                                        | `isBreaking: true`                             |
 | Display    | `.toISOString()`                            | `.toInstant().round(...).toString().replace(...)`                           | `isBreaking: true`                             |
 | Display    | `.format(formatString)`                     | `toFormattedString(zdt, fmt)` (runtime helper)                              | `isBreaking: true`                             |
+| Display    | `.valueOf()` / `+moment()`                  | `.epochMilliseconds`                                                        | `isBreaking: true`                             |
+| Display    | `.unix()`                                   | `Math.floor(zdt.epochMilliseconds / 1000)`                                  | `isBreaking: true`                             |
+| Display    | `.toString()`                               | `toMomentString(zdt)` (runtime helper)                                      | `isBreaking: true`                             |
+| Display    | `.toJSON()`                                 | Same expression as `.toISOString()`                                         | `isBreaking: true`                             |
+| Manipulate | `.clone()`                                  | Identity pass-through (Temporal objects are immutable)                      |                                                |
+| Display    | `.diff(other, unit?, float?)`               | `diffZonedDateTime(zdt, other, unit?, float?)` (runtime helper)             | `isBreaking: true`; unit must be a literal     |
 
 ### Known Limitations in Current Coverage
 
@@ -43,27 +49,27 @@ The codemod today handles the following Moment.js methods:
   - Moment's `.valueOf()` returns epoch milliseconds; `ZonedDateTime.epochMilliseconds` is a direct equivalent
   - Also handles implicit numeric coercion (`+moment()`) — detected via `UnaryExpression('+')` parent in `findAllMomentFactoryCalls`
 
-- [ ] **`.unix()`** → `Math.floor(zdt.epochMilliseconds / 1000)`
+- [x] **`.unix()`** → `Math.floor(zdt.epochMilliseconds / 1000)`
   - Effort: S
   - `isBreaking: true` — returns epoch seconds as a number
   - Can be emitted as an inline expression; no runtime helper needed
 
-- [ ] **`.toString()`** → `.toString()`
+- [x] **`.toString()`** → `toMomentString(zdt)` (runtime helper)
   - Effort: S
   - `isBreaking: true` — returns a string
-  - Moment's `.toString()` produces an RFC 2822-ish string; Temporal's produces RFC 9557 (ISO 8601 with annotations). Accept the format difference and emit `.toString()` directly, or add a runtime helper for strict parity.
+  - Moment's `.toString()` produces an RFC 2822-ish string; Temporal's produces RFC 9557 (ISO 8601 with annotations). Implemented via the `toMomentString` runtime helper for strict parity with Moment's output shape.
 
-- [ ] **`.toJSON()`** → `.toInstant().toString()`
+- [x] **`.toJSON()`** → `.toInstant().toString()`
   - Effort: S
   - `isBreaking: true` — returns a UTC ISO 8601 string (same output as `.toISOString()`)
-  - Reuse the existing `toISOString` processor logic
+  - Reuses the `toISOString` expression via the shared `instantIsoStringExpression` builder
 
-- [ ] **`.clone()`** → identity pass-through
+- [x] **`.clone()`** → identity pass-through
   - Effort: S
   - `isBreaking: false` — returns a Temporal object
   - Temporal objects are immutable, so `.clone()` is semantically a no-op; the processor returns the preceding expression unchanged
 
-- [ ] **`.diff(other, unit?, float?)`** → `zdt.since(other).total({ unit })`
+- [x] **`.diff(other, unit?, float?)`** → `diffZonedDateTime(zdt, other, unit?, float?)` (runtime helper)
   - Effort: M
   - `isBreaking: true` — returns a number
   - Handle: no-unit default (milliseconds), unit conversion map, optional float truncation (default is floor)
