@@ -26,6 +26,7 @@ The codemod today handles the following Moment.js methods:
 | Display    | `.unix()`                                   | `Math.floor(zdt.epochMilliseconds / 1000)`                                  | `isBreaking: true`                             |
 | Display    | `.toString()`                               | `toMomentString(zdt)` (runtime helper)                                      | `isBreaking: true`                             |
 | Display    | `.toJSON()`                                 | Same expression as `.toISOString()`                                         | `isBreaking: true`                             |
+| Manipulate | `.clone()`                                  | Identity pass-through (Temporal objects are immutable)                      |                                                |
 
 ### Known Limitations in Current Coverage
 
@@ -62,7 +63,7 @@ The codemod today handles the following Moment.js methods:
   - `isBreaking: true` — returns a UTC ISO 8601 string (same output as `.toISOString()`)
   - Reuses the `toISOString` expression via the shared `instantIsoStringExpression` builder
 
-- [ ] **`.clone()`** → identity pass-through
+- [x] **`.clone()`** → identity pass-through
   - Effort: S
   - `isBreaking: false` — returns a Temporal object
   - Temporal objects are immutable, so `.clone()` is semantically a no-op; the processor returns the preceding expression unchanged

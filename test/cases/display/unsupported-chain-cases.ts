@@ -4,16 +4,20 @@ import moment from "moment";
 // untouched — including when the unsupported call sits before a supported
 // breaking call, and inside a unary plus coercion.
 
+// `.local()` is the unsupported exemplar: it has no registered processor,
+// and on a local-mode moment it is a runtime no-op, so the untransformed
+// original and "transformed" output stay behaviorally identical.
+
 export const unsupportedBeforeBreaker = (): string => {
-  return moment().clone().toDate().toISOString();
+  return moment().local().toDate().toISOString();
 };
 
 export const unsupportedInsideUnaryPlus = (): number => {
-  return +moment().clone();
+  return +moment().local();
 };
 
 export const unsupportedAfterAdd = (): number => {
-  return moment().add(1, "day").clone().valueOf();
+  return moment().add(1, "day").local().valueOf();
 };
 
 export const unaryMinusIsNotACoercion = (): number => {
@@ -42,6 +46,6 @@ export const methodReferenceIsNotAChain = (): string => {
 export const expectNoMoment = false;
 
 export const expectedAnnotations = [
-  'the "clone" method is not yet supported',
+  'the "local" method is not yet supported',
   "only expressions that evaluate to a primitive or Date can be transformed",
 ];

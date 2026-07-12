@@ -9,6 +9,7 @@
  * import here.
  */
 import "./processors/add";
+import "./processors/clone";
 import "./processors/endOf";
 import "./processors/format";
 import "./processors/startOf";
