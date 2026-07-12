@@ -15,4 +15,5 @@ import "./processors/startOf";
 import "./processors/subtract";
 import "./processors/toDate";
 import "./processors/toISOString";
+import "./processors/unix";
 import "./processors/valueOf";

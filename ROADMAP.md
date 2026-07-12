@@ -22,6 +22,8 @@ The codemod today handles the following Moment.js methods:
 | Display    | `.toDate()`                                 | `toLegacyDate(zdt)` (runtime helper)                                        | `isBreaking: true`                             |
 | Display    | `.toISOString()`                            | `.toInstant().round(...).toString().replace(...)`                           | `isBreaking: true`                             |
 | Display    | `.format(formatString)`                     | `toFormattedString(zdt, fmt)` (runtime helper)                              | `isBreaking: true`                             |
+| Display    | `.valueOf()` / `+moment()`                  | `.epochMilliseconds`                                                        | `isBreaking: true`                             |
+| Display    | `.unix()`                                   | `Math.floor(zdt.epochMilliseconds / 1000)`                                  | `isBreaking: true`                             |
 
 ### Known Limitations in Current Coverage
 
@@ -43,7 +45,7 @@ The codemod today handles the following Moment.js methods:
   - Moment's `.valueOf()` returns epoch milliseconds; `ZonedDateTime.epochMilliseconds` is a direct equivalent
   - Also handles implicit numeric coercion (`+moment()`) — detected via `UnaryExpression('+')` parent in `findAllMomentFactoryCalls`
 
-- [ ] **`.unix()`** → `Math.floor(zdt.epochMilliseconds / 1000)`
+- [x] **`.unix()`** → `Math.floor(zdt.epochMilliseconds / 1000)`
   - Effort: S
   - `isBreaking: true` — returns epoch seconds as a number
   - Can be emitted as an inline expression; no runtime helper needed
