@@ -24,6 +24,13 @@ export const toFormattedStringImport: (j: JSCodeshift) => ImportDeclaration =
         .statement`import toFormattedString from 'moment-to-temporal/runtime/to-formatted-string';`,
   );
 
+export const toMomentStringImport: (j: JSCodeshift) => ImportDeclaration =
+  once(
+    (j) =>
+      j.template
+        .statement`import toMomentString from 'moment-to-temporal/runtime/to-moment-string';`,
+  );
+
 export const toEpochNanosImport: (j: JSCodeshift) => ImportDeclaration = once(
   (j) =>
     j.template

@@ -24,6 +24,7 @@ The codemod today handles the following Moment.js methods:
 | Display    | `.format(formatString)`                     | `toFormattedString(zdt, fmt)` (runtime helper)                              | `isBreaking: true`                             |
 | Display    | `.valueOf()` / `+moment()`                  | `.epochMilliseconds`                                                        | `isBreaking: true`                             |
 | Display    | `.unix()`                                   | `Math.floor(zdt.epochMilliseconds / 1000)`                                  | `isBreaking: true`                             |
+| Display    | `.toString()`                               | `toMomentString(zdt)` (runtime helper)                                      | `isBreaking: true`                             |
 
 ### Known Limitations in Current Coverage
 
@@ -50,10 +51,10 @@ The codemod today handles the following Moment.js methods:
   - `isBreaking: true` — returns epoch seconds as a number
   - Can be emitted as an inline expression; no runtime helper needed
 
-- [ ] **`.toString()`** → `.toString()`
+- [x] **`.toString()`** → `toMomentString(zdt)` (runtime helper)
   - Effort: S
   - `isBreaking: true` — returns a string
-  - Moment's `.toString()` produces an RFC 2822-ish string; Temporal's produces RFC 9557 (ISO 8601 with annotations). Accept the format difference and emit `.toString()` directly, or add a runtime helper for strict parity.
+  - Moment's `.toString()` produces an RFC 2822-ish string; Temporal's produces RFC 9557 (ISO 8601 with annotations). Implemented via the `toMomentString` runtime helper for strict parity with Moment's output shape.
 
 - [ ] **`.toJSON()`** → `.toInstant().toString()`
   - Effort: S

@@ -31,6 +31,10 @@ export default defineConfig({
         __dirname,
         "../src/runtime/to-epoch-nanos.ts",
       ),
+      "moment-to-temporal/runtime/to-moment-string": path.resolve(
+        __dirname,
+        "../src/runtime/to-moment-string.ts",
+      ),
     },
   },
 });
