@@ -27,6 +27,7 @@ The codemod today handles the following Moment.js methods:
 | Display    | `.toString()`                               | `toMomentString(zdt)` (runtime helper)                                      | `isBreaking: true`                             |
 | Display    | `.toJSON()`                                 | Same expression as `.toISOString()`                                         | `isBreaking: true`                             |
 | Manipulate | `.clone()`                                  | Identity pass-through (Temporal objects are immutable)                      |                                                |
+| Display    | `.diff(other, unit?, float?)`               | `diffZonedDateTime(zdt, other, unit?, float?)` (runtime helper)             | `isBreaking: true`; unit must be a literal     |
 
 ### Known Limitations in Current Coverage
 
@@ -68,7 +69,7 @@ The codemod today handles the following Moment.js methods:
   - `isBreaking: false` — returns a Temporal object
   - Temporal objects are immutable, so `.clone()` is semantically a no-op; the processor returns the preceding expression unchanged
 
-- [ ] **`.diff(other, unit?, float?)`** → `zdt.since(other).total({ unit })`
+- [x] **`.diff(other, unit?, float?)`** → `diffZonedDateTime(zdt, other, unit?, float?)` (runtime helper)
   - Effort: M
   - `isBreaking: true` — returns a number
   - Handle: no-unit default (milliseconds), unit conversion map, optional float truncation (default is floor)

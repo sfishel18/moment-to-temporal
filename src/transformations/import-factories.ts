@@ -24,6 +24,12 @@ export const toFormattedStringImport: (j: JSCodeshift) => ImportDeclaration =
         .statement`import toFormattedString from 'moment-to-temporal/runtime/to-formatted-string';`,
   );
 
+export const diffImport: (j: JSCodeshift) => ImportDeclaration = once(
+  (j) =>
+    j.template
+      .statement`import diffZonedDateTime from 'moment-to-temporal/runtime/diff';`,
+);
+
 export const toMomentStringImport: (j: JSCodeshift) => ImportDeclaration =
   once(
     (j) =>

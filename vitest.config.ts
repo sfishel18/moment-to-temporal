@@ -23,6 +23,10 @@ export default defineConfig({
         __dirname,
         "src/runtime/to-moment-string.ts",
       ),
+      "moment-to-temporal/runtime/diff": path.resolve(
+        __dirname,
+        "src/runtime/diff.ts",
+      ),
     },
   },
 });

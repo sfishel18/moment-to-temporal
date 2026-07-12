@@ -10,6 +10,7 @@
  */
 import "./processors/add";
 import "./processors/clone";
+import "./processors/diff";
 import "./processors/endOf";
 import "./processors/format";
 import "./processors/startOf";
