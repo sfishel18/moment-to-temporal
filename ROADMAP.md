@@ -25,6 +25,7 @@ The codemod today handles the following Moment.js methods:
 | Display    | `.valueOf()` / `+moment()`                  | `.epochMilliseconds`                                                        | `isBreaking: true`                             |
 | Display    | `.unix()`                                   | `Math.floor(zdt.epochMilliseconds / 1000)`                                  | `isBreaking: true`                             |
 | Display    | `.toString()`                               | `toMomentString(zdt)` (runtime helper)                                      | `isBreaking: true`                             |
+| Display    | `.toJSON()`                                 | Same expression as `.toISOString()`                                         | `isBreaking: true`                             |
 
 ### Known Limitations in Current Coverage
 
@@ -56,10 +57,10 @@ The codemod today handles the following Moment.js methods:
   - `isBreaking: true` — returns a string
   - Moment's `.toString()` produces an RFC 2822-ish string; Temporal's produces RFC 9557 (ISO 8601 with annotations). Implemented via the `toMomentString` runtime helper for strict parity with Moment's output shape.
 
-- [ ] **`.toJSON()`** → `.toInstant().toString()`
+- [x] **`.toJSON()`** → `.toInstant().toString()`
   - Effort: S
   - `isBreaking: true` — returns a UTC ISO 8601 string (same output as `.toISOString()`)
-  - Reuse the existing `toISOString` processor logic
+  - Reuses the `toISOString` expression via the shared `instantIsoStringExpression` builder
 
 - [ ] **`.clone()`** → identity pass-through
   - Effort: S
